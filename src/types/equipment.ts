@@ -1,7 +1,19 @@
 export interface Equipment {
-    id: number;
-    equipmentModelId: number;
-    name: string;
+  id: number;
+  name: string;
+  equipmentModelId: number;
+  currentState: 'operating' | 'stopped' | 'maintenance';
+  lastUpdate: string;
+  position: {
+    lat: number;
+    lon: number;
+  };
+}
+
+export interface EquipmentContextType {
+  equipment: Equipment[];
+  loading: boolean;
+  error: string | null;
 }
 
 export interface EquipmentModel {
