@@ -1,39 +1,81 @@
 export interface Equipment {
-  id: number;
-  name: string;
-  equipmentModelId: number;
-  currentState: 'operating' | 'stopped' | 'maintenance';
-  lastUpdate: string;
-  position: {
-    lat: number;
-    lon: number;
-  };
-}
-
-export interface EquipmentContextType {
-  equipment: Equipment[];
-  loading: boolean;
-  error: string | null;
+    id: string;
+    name: string;
+    equipmentModelId: string;
 }
 
 export interface EquipmentModel {
-    id: number;
+    id: string;
     name: string;
-    hourlyEarnings: number;
-    manufacturingYear: number;
-}
-
-export interface EquipmentPosition {
-    id: number;
-    equipmentId: number;
-    date: string;
-    lat: number;
-    long: number;
+    hourlyEarnings: {
+        equipmentStateId: string;
+        value: number;
+    }[];
 }
 
 export interface EquipmentState {
-    id: number;
-    equipmentId: number;
-    equipmentStateId: number;
+    id: string;
+    name: string;
+    color: string;
+}
+
+export interface StateHistory {
     date: string;
+    equipmentStateId: string;
+}
+
+export interface Position {
+    date: string;
+    lat: number;
+    lon: number;
+}
+
+export interface EquipmentContextType {
+    equipment: Equipment[];
+    equipmentModels: EquipmentModel[];
+    equipmentStates: EquipmentState[];
+    stateHistory: StateHistoryRecord;
+    positionHistory: PositionHistoryRecord;
+    loading: boolean;
+    error: string | null;
+}
+
+export interface StateHistoryEntry {
+    date: string;
+    equipmentStateId: string;
+}
+
+export interface PositionHistoryEntry {
+    date: string;
+    lat: number;
+    lon: number;
+}
+
+export interface StateHistoryRecord {
+    [equipmentId: string]: StateHistoryEntry[];
+}
+
+export interface PositionHistoryRecord {
+    [equipmentId: string]: PositionHistoryEntry[];
+}
+
+export interface StateHistoryItem {
+    date: string;
+    equipmentStateId: string;
+}
+
+export interface PositionHistoryItem {
+    date: string;
+    lat: number;
+    lon: number;
+}
+
+export interface HistoryData {
+    equipmentId: string;
+    states: StateHistoryItem[];
+}
+
+export interface PositionData {
+    equipmentId: string;
+    positions: PositionHistoryItem[];
 }
