@@ -1,4 +1,4 @@
-import { MapContainer, Marker, TileLayer, Popup, Tooltip } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEquipment } from '../hooks/useEquipment';
@@ -24,6 +24,7 @@ const Map = () => {
     equipmentModels,
     positionHistory,
     stateHistory,
+    getEquipmentName, // Add this to use the existing function
     loading,
     error
   } = useEquipment();
@@ -151,7 +152,10 @@ const Map = () => {
           >
             <Tooltip direction="top" offset={[0, -32]} opacity={0.9} permanent={false} className="custom-tooltip">
               <div className="text-base p-2 min-w-[150px]">
-                <p className="font-bold text-xl">{item.model}</p>
+                <p className="font-bold text-xl">{getEquipmentName(item.id)}</p>
+                <p className="text-lg mt-1">
+                  <strong>Modelo:</strong> {item.model}
+                </p>
                 <p className="text-lg mt-1">
                   <strong>Status:</strong> {getStateName(item.state?.equipmentStateId)}
                 </p>

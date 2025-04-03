@@ -36,6 +36,8 @@ export interface EquipmentContextType {
     equipmentStates: EquipmentState[];
     stateHistory: StateHistoryRecord;
     positionHistory: PositionHistoryRecord;
+    equipmentNames: Record<string, string>;
+    getEquipmentName: (equipmentId: string) => string;
     loading: boolean;
     error: string | null;
 }

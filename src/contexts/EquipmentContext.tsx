@@ -20,6 +20,7 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
     const [equipmentStates, setEquipmentStates] = useState<EquipmentState[]>([])
     const [stateHistory, setStateHistory] = useState<Record<string, StateHistoryItem[]>>({})
     const [positionHistory, setPositionHistory] = useState<Record<string, PositionHistoryItem[]>>({})
+    const [equipmentNames, setEquipmentNames] = useState<Record<string, string>>({})
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -44,6 +45,28 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                 setEquipmentModels(modelsData)
                 setEquipmentStates(statesData)
                 
+                // Generate friendly names for equipment
+                const names: Record<string, string> = {}
+                const modelCounts: Record<string, number> = {}
+                
+                equipmentData.forEach((eq: Equipment) => {
+                    const model = modelsData.find((m: EquipmentModel) => m.id === eq.equipmentModelId)
+                    if (model) {
+                        // Initialize counter for this model if not exists
+                        if (!modelCounts[model.name]) {
+                            modelCounts[model.name] = 0
+                        }
+                        
+                        // Increment counter
+                        modelCounts[model.name]++
+                        
+                        // Create friendly name like "Trator 1", "Escavadora 2", etc.
+                        names[eq.id] = `${model.name} ${modelCounts[model.name]}`
+                    }
+                })
+                
+                setEquipmentNames(names)
+                
                 const stateHistoryRecord = (stateHistoryData as HistoryData[]).reduce((acc, item) => {
                     acc[item.equipmentId] = item.states
                     return acc
@@ -67,6 +90,11 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         loadAllData()
     }, [])
 
+    // Helper function to get friendly name
+    const getEquipmentName = (equipmentId: string) => {
+        return equipmentNames[equipmentId] || 'Equipamento Desconhecido'
+    }
+
     return (
         <EquipmentContext.Provider 
             value={{ 
@@ -74,7 +102,9 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                 equipmentModels, 
                 equipmentStates, 
                 stateHistory, 
-                positionHistory, 
+                positionHistory,
+                equipmentNames,
+                getEquipmentName, 
                 loading, 
                 error 
             }}
