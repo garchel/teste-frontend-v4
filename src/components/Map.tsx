@@ -74,17 +74,47 @@ const Map = () => {
 
   // Create icon based on model
   const getIcon = (modelName: string) => {
-    const iconUrl = 
-      modelName.toLowerCase() === 'truck' ? truckIcon :
-      modelName.toLowerCase() === 'excavator' ? excavatorIcon :
-      modelName.toLowerCase() === 'tractor' ? tractorIcon : 
-      icon;
-      
-    return new L.Icon({
-      iconUrl,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16]
-    });
+    console.log('Creating icon for model:', modelName); // Debug log
+    
+    // Create custom icons - pre-initialize them
+    const customIcons = {
+      truck: new L.Icon({
+        iconUrl: truckIcon,
+        iconSize: [64, 64],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      }),
+      excavator: new L.Icon({
+        iconUrl: excavatorIcon,
+        iconSize: [64, 64],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      }),
+      tractor: new L.Icon({
+        iconUrl: tractorIcon,
+        iconSize: [64, 64],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      })
+    };
+    
+    // Match model name to icon (case insensitive)
+    const model = modelName.toLowerCase();
+    
+    // Map actual model names to icon types
+    if (model.includes('caminhão')) {
+      console.log('Using truck icon for:', model); 
+      return customIcons.truck;
+    } else if (model.includes('harvester')) {
+      console.log('Using tractor icon for:', model);
+      return customIcons.tractor;
+    } else if (model.includes('garra')) {
+      console.log('Using excavator icon for:', model);
+      return customIcons.excavator;
+    } else {
+      console.log('Using default icon for:', model);
+      return DefaultIcon;
+    }
   };
 
   return (
