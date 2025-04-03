@@ -19,17 +19,25 @@ const Filter = () => {
         { id: 'maintenance', label: 'Manutenção', active: false },
     ])
 
-    //Toggle type Filter
+    // Track which dropdown is open
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+    // Toggle dropdown visibility
+    const toggleDropdown = (dropdown: string) => {
+        setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+    }
+
+    // Toggle type Filter
     const toggleTypeFilter = (id: string) => {
         const updateFilters = typeFilters.map(filter => 
             filter.id === id ? { ...filter, active: !filter.active } : filter)
         setTypeFilters(updateFilters)
     
-    // Log the filter change
-    const filter = typeFilters.find(f => f.id === id)
-    if (filter) {
-        const newState = !filter.active
-        console.log(`Filtro de tipo "${filter.label}" ${newState ? 'ativado' : 'desativado'}`)
+        // Log the filter change
+        const filter = typeFilters.find(f => f.id === id)
+        if (filter) {
+            const newState = !filter.active
+            console.log(`Filtro de tipo "${filter.label}" ${newState ? 'ativado' : 'desativado'}`)
         }
     }
 
@@ -47,44 +55,90 @@ const Filter = () => {
         }
     }
 
+    // Count active filters
+    const activeTypeFilters = typeFilters.filter(f => f.active).length;
+    const activeStateFilters = stateFilters.filter(f => f.active).length;
+
     return (
         <div className="bg-white rounded-lg shadow p-4 mb-4">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Filtros</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Filtros:</h2>
 
-            <div className="mb-4">
-                <h3 className="text-mb font-medium mb-2 text-gray-700">Tipo:</h3>
-                <div className="flex flex-wrap gap-2">
-                    {typeFilters.map(filter => (
-                        <button
-                            key={filter.id}
-                            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                                filter.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                            onClick={() => toggleTypeFilter(filter.id)}
-                        >
-                            {filter.label}
-                        </button>
-                    ))}
-            </div>
-        </div>
-
-        <div>
-            <h3 className="text-md font-medium mb-2 text-gray-700">Estado:</h3>
-            <div className="flex flex-wrap gap-2">
-                {stateFilters.map(filter => (
-                    <button
-                        key={filter.id}
-                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                            filter.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            <div className="flex flex-wrap gap-3">
+                {/* Type Filter Dropdown */}
+                <div className="relative">
+                    <button 
+                        className="flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 font-medium"
+                        onClick={() => toggleDropdown('type')}
+                    >
+                        Tipo: {activeTypeFilters > 0 && <span className="ml-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{activeTypeFilters}</span>}
+                        <svg className={`w-4 h-4 ml-2 transition-transform ${openDropdown === 'type' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    <div 
+                        className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 transition-all duration-300 ease-in-out ${
+                            openDropdown === 'type' 
+                                ? 'opacity-100 transform translate-y-0' 
+                                : 'opacity-0 transform -translate-y-2 pointer-events-none'
                         }`}
-                        onClick={() => toggleStateFilter(filter.id)}
-                        >
-                            {filter.label}
-                        </button>
-                ))}
+                    >
+                        <div className="p-2">
+                            {typeFilters.map(filter => (
+                                <div key={filter.id} className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer" onClick={() => toggleTypeFilter(filter.id)}>
+                                    <div className={`w-5 h-5 rounded border flex items-center justify-center ${filter.active ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}>
+                                        {filter.active && (
+                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <span className="ml-2 text-gray-700">{filter.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* State Filter Dropdown */}
+                <div className="relative">
+                    <button 
+                        className="flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 font-medium"
+                        onClick={() => toggleDropdown('state')}
+                    >
+                        Estado: {activeStateFilters > 0 && <span className="ml-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{activeStateFilters}</span>}
+                        <svg className={`w-4 h-4 ml-2 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    <div 
+                        className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 transition-all duration-300 ease-in-out ${
+                            openDropdown === 'state' 
+                                ? 'opacity-100 transform translate-y-0' 
+                                : 'opacity-0 transform -translate-y-2 pointer-events-none'
+                        }`}
+                    >
+                        <div className="p-2">
+                            {stateFilters.map(filter => (
+                                <div key={filter.id} className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer" onClick={() => toggleStateFilter(filter.id)}>
+                                    <div className={`w-5 h-5 rounded border flex items-center justify-center ${filter.active ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}>
+                                        {filter.active && (
+                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <span className="ml-2 text-gray-700">{filter.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     )
 }
 
