@@ -4,20 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import { useEquipment } from '../hooks/useEquipment';
 import { useEffect, useState } from 'react';  
 
-// Fix Leaflet icon issues
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Set up default icon
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
-
 // Import equipment icons
 import truckIcon from '../assets/icons/truck.png';
 import excavatorIcon from '../assets/icons/excavator.png';
@@ -74,8 +60,6 @@ const Map = () => {
 
   // Create icon based on model
   const getIcon = (modelName: string) => {
-    console.log('Creating icon for model:', modelName); // Debug log
-    
     // Create custom icons - pre-initialize them
     const customIcons = {
       truck: new L.Icon({
@@ -103,17 +87,14 @@ const Map = () => {
     
     // Map actual model names to icon types
     if (model.includes('caminhão')) {
-      console.log('Using truck icon for:', model); 
       return customIcons.truck;
     } else if (model.includes('harvester')) {
-      console.log('Using tractor icon for:', model);
       return customIcons.tractor;
     } else if (model.includes('garra')) {
-      console.log('Using excavator icon for:', model);
       return customIcons.excavator;
     } else {
-      console.log('Using default icon for:', model);
-      return DefaultIcon;
+      // Fallback to a default custom icon
+      return customIcons.truck;
     }
   };
 
