@@ -10,8 +10,10 @@ import {
     PositionHistoryItem
 } from "../types/equipment"
 
-export const EquipmentContext = createContext<EquipmentContextType | null>(null)
+const EquipmentContext = createContext<EquipmentContextType | null>(null)
 
+// Função que carrega todos os dados e os armazena
+// criando o contexto para a aplicação acessar os dados
 export function EquipmentProvider({ children }: { children: React.ReactNode }) {
     const [equipment, setEquipment] = useState<Equipment[]>([])
     const [equipmentModels, setEquipmentModels] = useState<EquipmentModel[]>([])
@@ -81,3 +83,5 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         </EquipmentContext.Provider>
     )
 }
+
+export { EquipmentContext } // Exportação separada para evitar conflitos com Fast Refresh

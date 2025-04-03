@@ -1,6 +1,8 @@
 import { useContext } from "react"
 import { EquipmentContext } from "../contexts/EquipmentContext"
 
+
+// Função que retorna os 
 export function useEquipment() {
     const context = useContext(EquipmentContext)
     if (!context) {

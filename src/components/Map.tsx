@@ -1,18 +1,122 @@
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useEquipment } from '../hooks/useEquipment';
+import { useEffect, useState } from 'react';  
+
+// Fix Leaflet icon issues
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Set up default icon
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Import equipment icons
+import truckIcon from '../assets/icons/truck.png';
+import excavatorIcon from '../assets/icons/excavator.png';
+import tractorIcon from '../assets/icons/tractor.png';
 
 const Map = () => {
+  const {
+    equipment,
+    equipmentModels,
+    positionHistory,
+    stateHistory,
+    loading,
+    error
+  } = useEquipment();
+  
+  // Use state to store processed equipment data
+  const [equipmentData, setEquipmentData] = useState<any[]>([]);
+
+  // Process equipment data once when loaded
+  useEffect(() => {
+    if (!loading && !error && equipment.length > 0) {
+      const processedData = equipment.map(eq => {
+        // Get equipment info
+        const equipmentData = equipment.find(e => e.id === eq.id);
+        const model = equipmentModels.find(m => m.id === equipmentData?.equipmentModelId);
+        
+        // Get latest position
+        const positions = positionHistory[eq.id] || [];
+        let position = null;
+        
+        if (positions.length > 0) {
+          const sortedPositions = [...positions].sort((a, b) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          
+          position = [sortedPositions[0].lat, sortedPositions[0].lon];
+        }
+        
+        // Get latest state
+        const states = stateHistory[eq.id] || [];
+        const latestState = states.length > 0 ? states[states.length - 1] : null;
+        
+        return {
+          id: eq.id,
+          model: model?.name || 'unknown',
+          position,
+          state: latestState
+        };
+      }).filter(item => item.position !== null);
+      
+      setEquipmentData(processedData);
+    }
+  }, [loading, equipment, equipmentModels, positionHistory, stateHistory]);
+
+  // Create icon based on model
+  const getIcon = (modelName: string) => {
+    const iconUrl = 
+      modelName.toLowerCase() === 'truck' ? truckIcon :
+      modelName.toLowerCase() === 'excavator' ? excavatorIcon :
+      modelName.toLowerCase() === 'tractor' ? tractorIcon : 
+      icon;
+      
+    return new L.Icon({
+      iconUrl,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+  };
+
   return (
-    <MapContainer
-      center={[-23.5505, -46.6333]} 
-      zoom={13}
-      className="h-screen w-full"
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-    </MapContainer>
+    <>
+      <h2 className="text-lg font-semibold mb-3">Mapa de Rastreamento</h2>
+      <MapContainer
+        center={[-19.2, -46]} 
+        zoom={12}
+        className="h-full w-full"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {equipmentData.map(item => (
+          <Marker
+            key={item.id}
+            position={item.position}
+            icon={getIcon(item.model)}
+          >
+            <Popup>
+              <div>
+                <p><strong>ID:</strong> {item.id}</p>
+                <p><strong>Model:</strong> {item.model}</p>
+                <p><strong>State:</strong> {item.state?.equipmentStateId || 'Unknown'}</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </>
   );
 };
 
