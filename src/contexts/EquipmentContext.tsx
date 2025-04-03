@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useMemo } from "react"
+import { createContext, useState, useEffect, useMemo, useCallback } from "react"
 import { 
     Equipment, 
     EquipmentModel, 
@@ -37,6 +37,12 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         { id: 'stopped', label: 'Parado', active: false },
         { id: 'maintenance', label: 'Manutenção', active: false },
     ])
+
+    // Adicionar estado para a data selecionada
+    const [selectedDate, setSelectedDate] = useState<Date>(() => {
+        // Por padrão, usar a data mais recente disponível nos dados ou a data atual
+        return new Date('2021-02-28T23:59:59.999Z'); // Data final dos dados históricos
+    });
 
     useEffect(() => {
         const loadAllData = async () => {
@@ -123,6 +129,40 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         )
     }
 
+    // Função para atualizar a data selecionada
+    const updateSelectedDate = (date: Date) => {
+        setSelectedDate(date);
+    }
+
+    // Avançar a data por um intervalo específico (em horas)
+    const advanceTime = (hours: number) => {
+        const newDate = new Date(selectedDate);
+        newDate.setHours(newDate.getHours() + hours);
+        
+        // Garantir que não ultrapasse os limites dos dados
+        const maxDate = new Date('2021-02-28T23:59:59.999Z');
+        const minDate = new Date('2021-02-01T00:00:00.000Z');
+        
+        if (newDate > maxDate) {
+            setSelectedDate(maxDate);
+        } else if (newDate < minDate) {
+            setSelectedDate(minDate);
+        } else {
+            setSelectedDate(newDate);
+        }
+    }
+
+    // Pular para momentos específicos
+    const jumpToTime = (timePoint: 'start' | 'end' | 'specific', specificDate?: Date) => {
+        if (timePoint === 'start') {
+            setSelectedDate(new Date('2021-02-01T00:00:00.000Z'));
+        } else if (timePoint === 'end') {
+            setSelectedDate(new Date('2021-02-28T23:59:59.999Z'));
+        } else if (timePoint === 'specific' && specificDate) {
+            setSelectedDate(specificDate);
+        }
+    }
+
     // Get equipment type based on model name
     const getEquipmentType = (modelName: string): string => {
         const model = modelName.toLowerCase()
@@ -132,61 +172,95 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         return 'truck' // Default
     }
 
-    // Get equipment state category
-    const getEquipmentStateCategory = (stateId?: string): string => {
-        if (!stateId) return 'unknown'
+    // Obter o estado do equipamento na data selecionada
+    const getEquipmentStateAtDate = useCallback((equipmentId: string, date: Date): string | undefined => {
+        const states = stateHistory[equipmentId] || [];
+        if (states.length === 0) return undefined;
         
-        const stateInfo = equipmentStates.find(state => state.id === stateId)
-        if (!stateInfo) return 'unknown'
+        // Encontrar o estado mais recente antes da data selecionada
+        const timestamp = date.getTime();
+        let closestState = undefined;
+        let closestTime = -Infinity;
         
-        if (stateInfo.name === 'Operando') return 'operating'
-        if (stateInfo.name === 'Parado') return 'stopped'
-        if (stateInfo.name === 'Manutenção') return 'maintenance'
-        
-        return 'unknown'
-    }
-
-    // Get current state ID for an equipment
-    const getCurrentStateId = (equipmentId: string): string | undefined => {
-        const states = stateHistory[equipmentId] || []
-        if (states.length === 0) return undefined
-        return states[states.length - 1].equipmentStateId
-    }
-
-    // Filter equipment based on active filters
-    const filteredEquipment = useMemo(() => {
-        // If no filters are active, return all equipment
-        const activeTypeFilters = typeFilters.filter(f => f.active)
-        const activeStateFilters = stateFilters.filter(f => f.active)
-        
-        if (activeTypeFilters.length === 0 && activeStateFilters.length === 0) {
-            return equipment
+        for (const state of states) {
+          const stateTime = new Date(state.date).getTime();
+          if (stateTime <= timestamp && stateTime > closestTime) {
+            closestTime = stateTime;
+            closestState = state.equipmentStateId;
+          }
         }
         
+        return closestState;
+      }, [stateHistory]);
+
+    // Obter a posição do equipamento na data selecionada
+    const getEquipmentPositionAtDate = useCallback((equipmentId: string, date: Date): [number, number] | null => {
+        const positions = positionHistory[equipmentId] || [];
+        if (positions.length === 0) return null;
+        
+        // Encontrar a posição mais recente antes da data selecionada
+        const timestamp = date.getTime();
+        let closestPosition: [number, number] | null = null;
+        let closestTime = -Infinity;
+        
+        for (const position of positions) {
+          const posTime = new Date(position.date).getTime();
+          if (posTime <= timestamp && posTime > closestTime) {
+            closestTime = posTime;
+            closestPosition = [position.lat, position.lon];
+          }
+        }
+        
+        return closestPosition;
+      }, [positionHistory]);
+
+    // Filter equipment based on active filters and selected date
+    const filteredEquipment = useMemo(() => {
+        if (loading || error) return [];
+        
         return equipment.filter(eq => {
-            // Check type filter
-            if (activeTypeFilters.length > 0) {
-                const model = equipmentModels.find(m => m.id === eq.equipmentModelId)
-                if (!model) return false
-                
-                const equipmentType = getEquipmentType(model.name)
-                const matchesType = activeTypeFilters.some(f => f.id === equipmentType)
-                
-                if (!matchesType) return false
-            }
+          // Filtrar por tipo de equipamento
+          const model = equipmentModels.find(m => m.id === eq.equipmentModelId);
+          if (!model) return false;
+          
+          const equipmentType = getEquipmentType(model.name);
+          const typeFilterActive = typeFilters.some(f => f.active);
+          
+          // Se há filtros de tipo ativos, verificar se este equipamento corresponde
+          if (typeFilterActive) {
+            const matchesTypeFilter = typeFilters.some(
+              filter => filter.active && filter.id === equipmentType
+            );
+            if (!matchesTypeFilter) return false;
+          }
+          
+          // Filtrar por estado do equipamento na data selecionada
+          const stateAtDate = getEquipmentStateAtDate(eq.id, selectedDate);
+          if (!stateAtDate) return false; // Se não tiver estado na data, não mostrar
+          
+          const stateFilterActive = stateFilters.some(f => f.active);
+          
+          // Se há filtros de estado ativos, verificar se este equipamento corresponde
+          if (stateFilterActive) {
+            const stateInfo = equipmentStates.find(s => s.id === stateAtDate);
+            if (!stateInfo) return false;
             
-            // Check state filter
-            if (activeStateFilters.length > 0) {
-                const currentStateId = getCurrentStateId(eq.id)
-                const stateCategory = getEquipmentStateCategory(currentStateId)
-                const matchesState = activeStateFilters.some(f => f.id === stateCategory)
-                
-                if (!matchesState) return false
-            }
+            let stateType = '';
+            if (stateInfo.name === 'Operando') stateType = 'operating';
+            else if (stateInfo.name === 'Parado') stateType = 'stopped';
+            else if (stateInfo.name === 'Manutenção') stateType = 'maintenance';
             
-            return true
-        })
-    }, [equipment, equipmentModels, stateHistory, typeFilters, stateFilters])
+            const matchesStateFilter = stateFilters.some(
+              filter => filter.active && filter.id === stateType
+            );
+            if (!matchesStateFilter) return false;
+          }
+          
+          // Verificar se tem posição na data selecionada
+          const hasPositionAtDate = getEquipmentPositionAtDate(eq.id, selectedDate) !== null;
+          return hasPositionAtDate;
+        });
+      }, [equipment, equipmentModels, typeFilters, stateFilters, selectedDate, loading, error]);
 
     return (
         <EquipmentContext.Provider 
@@ -198,12 +272,19 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                 positionHistory,
                 equipmentNames,
                 getEquipmentName,
-                // Add filter-related values
+                // Propriedades relacionadas aos Filtros
                 typeFilters,
                 stateFilters,
                 toggleTypeFilter,
                 toggleStateFilter,
                 filteredEquipment,
+                // Propriedades relacionadas às datas
+                selectedDate,
+                updateSelectedDate,
+                getEquipmentStateAtDate,
+                getEquipmentPositionAtDate,
+                advanceTime,
+                jumpToTime,
                 loading, 
                 error 
             }}

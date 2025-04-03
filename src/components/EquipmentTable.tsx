@@ -9,17 +9,17 @@ type EquipmentTableItem = {
     stateColor: string,
     latitude: number | null,
     longitute: number | null,
-
 }
 
 const EquipmentTable = () => {
     const {
         filteredEquipment,
         equipmentModels,
-        positionHistory,
-        stateHistory,
         equipmentStates,
         getEquipmentName,
+        selectedDate,
+        getEquipmentStateAtDate,
+        getEquipmentPositionAtDate,
         loading,
         error
     } = useEquipment()
@@ -32,26 +32,16 @@ const EquipmentTable = () => {
                 // Get equipment info
                 const model = equipmentModels.find(m => m.id === eq.equipmentModelId)
 
-                //Get latest position
-                const positions = positionHistory[eq.id] || []
-                let latitude = null
-                let longitute = null
+                // Get position at selected date
+                const position = getEquipmentPositionAtDate(eq.id, selectedDate);
+                const latitude = position ? position[0] : null;
+                const longitute = position ? position[1] : null;
 
-                if (positions.length >0) {
-                    const sortedPositions = [...positions].sort((a,b) => 
-                    new Date(b.date).getTime() - new Date(a.date).getTime())
-                    
-                    latitude = sortedPositions[0].lat
-                    longitute = sortedPositions[0].lon
-                }
-
-                // Get latest state
-                const states = stateHistory[eq.id] || []
-                const latestState = states.length > 0 ? states[states.length - 1] : null
-
-
+                // Get state at selected date
+                const stateId = getEquipmentStateAtDate(eq.id, selectedDate);
+                
                 // Get state info
-                const stateInfo = latestState ? equipmentStates.find(s => s.id === latestState.equipmentStateId) : null
+                const stateInfo = stateId ? equipmentStates.find(s => s.id === stateId) : null;
             
                 return {
                     id: eq.id,
@@ -66,7 +56,7 @@ const EquipmentTable = () => {
 
             setTableData(processedData)
         }
-    }, [loading, filteredEquipment, equipmentModels, positionHistory, stateHistory, equipmentStates, getEquipmentName])
+    }, [loading, filteredEquipment, equipmentModels, equipmentStates, getEquipmentName, selectedDate, getEquipmentStateAtDate, getEquipmentPositionAtDate])
 
     if (loading) {
         return <div className="p-4">Carregando...</div>

@@ -6,7 +6,9 @@ const Filter = () => {
         typeFilters,
         stateFilters,
         toggleTypeFilter,
-        toggleStateFilter
+        toggleStateFilter,
+        selectedDate,
+        updateSelectedDate,
     } = useEquipment();
 
     // Track which dropdown is open
@@ -17,6 +19,14 @@ const Filter = () => {
         setOpenDropdown(openDropdown === dropdown ? null : dropdown);
     }
 
+    // Lida com a mudança de datas
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newDate = new Date(e.target.value)
+        if (!isNaN(newDate.getTime())){
+            updateSelectedDate(newDate)
+        }
+    }
+
     // Count active filters
     const activeTypeFilters = typeFilters.filter(f => f.active).length;
     const activeStateFilters = stateFilters.filter(f => f.active).length;
@@ -25,7 +35,22 @@ const Filter = () => {
         <div className="bg-white rounded-lg shadow p-4 mb-4">
             <h2 className="text-xl font-bold mb-4 text-gray-800">Filtros:</h2>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-10">
+                {/* Date Time Filter */}
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2 mb-2 relative">
+                        <input
+                            type="datetime-local"
+                            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
+                            focus:ring-blue-500 focus:border-blue-500" 
+                            value={selectedDate.toISOString().slice(0, 16)}
+                            onChange={handleDateChange} 
+                            min="2021-02-01T00:00" 
+                            max="2021-02-28T23:59"
+                        />
+                    </div>
+                </div>
+
                 {/* Type Filter Dropdown */}
                 <div className="relative">
                     <button 
