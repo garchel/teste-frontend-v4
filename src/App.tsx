@@ -2,6 +2,7 @@ import Map from "./components/Map"
 import Header from "./components/Header"
 import EquipmentSummary from "./components/EquipmentSummary"
 import { EquipmentProvider } from "./contexts/EquipmentContext"
+import EquipmentTable from "./components/EquipmentTable"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <main className="flex-1 p-4 flex gap-4">
             <div className="w-1/3 space-y-4">
               <EquipmentSummary />
+              <EquipmentTable />
             </div>
             <div className="w-2/3 bg-white rounded-lg shadow-sm p-4">
               <div className="h-[calc(100vh-200px)] w-full">
