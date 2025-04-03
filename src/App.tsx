@@ -1,8 +1,9 @@
 import Map from "./components/Map"
 import Header from "./components/Header"
 import EquipmentSummary from "./components/EquipmentSummary"
-import { EquipmentProvider } from "./contexts/EquipmentContext"
 import EquipmentTable from "./components/EquipmentTable"
+import Filter from "./components/Filter"
+import { EquipmentProvider } from "./contexts/EquipmentContext"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Header />
           <main className="flex-1 p-4 flex gap-4">
             <div className="w-1/3 space-y-4">
+              <Filter />
               <EquipmentSummary />
               <EquipmentTable />
             </div>
