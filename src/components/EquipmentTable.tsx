@@ -14,7 +14,7 @@ type EquipmentTableItem = {
 
 const EquipmentTable = () => {
     const {
-        equipment,
+        filteredEquipment,
         equipmentModels,
         positionHistory,
         stateHistory,
@@ -27,8 +27,8 @@ const EquipmentTable = () => {
     const [tableData, setTableData] = useState<EquipmentTableItem[]>([])
 
     useEffect(() => {
-        if (!loading && !error && equipment.length > 0){
-            const processedData = equipment.map(eq => {
+        if (!loading && !error) {
+            const processedData = filteredEquipment.map(eq => {
                 // Get equipment info
                 const model = equipmentModels.find(m => m.id === eq.equipmentModelId)
 
@@ -66,7 +66,7 @@ const EquipmentTable = () => {
 
             setTableData(processedData)
         }
-    }, [loading, equipment, equipmentModels, positionHistory, stateHistory, equipmentStates, getEquipmentName])
+    }, [loading, filteredEquipment, equipmentModels, positionHistory, stateHistory, equipmentStates, getEquipmentName])
 
     if (loading) {
         return <div className="p-4">Carregando...</div>

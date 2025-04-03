@@ -2,7 +2,7 @@
 import { useEquipment } from "../hooks/useEquipment"
 
 const EquipmentSummary = () => {
-    const { equipment, stateHistory, loading, error } = useEquipment()
+    const { filteredEquipment, stateHistory, loading, error } = useEquipment()
 
     if (loading) return <div>Carregando...</div>
     if (error) return <div>Erro ao carregar dados: {error}</div>
@@ -14,10 +14,10 @@ const EquipmentSummary = () => {
     }
 
     const equipmentStats = {
-        total: equipment.length,
-        operating: equipment.filter(eq => getCurrentState(eq.id) === "0808344c-454b-4c36-89e8-d7687e692d57").length,
-        stopped: equipment.filter(eq => getCurrentState(eq.id) === "baff9783-84e8-4e01-874b-6fd743b875ad").length,
-        maintenance: equipment.filter(eq => getCurrentState(eq.id) === "03b2d446-e3ba-4c82-8dc2-a5611fea6e1f").length,
+        total: filteredEquipment.length,
+        operating: filteredEquipment.filter(eq => getCurrentState(eq.id) === "0808344c-454b-4c36-89e8-d7687e692d57").length,
+        stopped: filteredEquipment.filter(eq => getCurrentState(eq.id) === "baff9783-84e8-4e01-874b-6fd743b875ad").length,
+        maintenance: filteredEquipment.filter(eq => getCurrentState(eq.id) === "03b2d446-e3ba-4c82-8dc2-a5611fea6e1f").length,
     }
 
     return (

@@ -1,23 +1,13 @@
 import { useState } from "react";
-
-type FilterOption = {
-    id: string,
-    label: string,
-    active: boolean
-}
+import { useEquipment } from "../hooks/useEquipment";
 
 const Filter = () => {
-    const [typeFilters, setTypeFilters] = useState<FilterOption[]>([
-        { id: 'truck', label: 'Caminhão', active: false },
-        { id: 'tractor', label: 'Trator', active: false },
-        { id: 'excavator', label: 'Escavadeira', active: false },
-    ])
-
-    const [stateFilters, setStateFilters] = useState<FilterOption[]>([
-        { id: 'operating', label: 'Operando', active: false },
-        { id: 'stopped', label: 'Parado', active: false },
-        { id: 'maintenance', label: 'Manutenção', active: false },
-    ])
+    const {
+        typeFilters,
+        stateFilters,
+        toggleTypeFilter,
+        toggleStateFilter
+    } = useEquipment();
 
     // Track which dropdown is open
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -25,34 +15,6 @@ const Filter = () => {
     // Toggle dropdown visibility
     const toggleDropdown = (dropdown: string) => {
         setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-    }
-
-    // Toggle type Filter
-    const toggleTypeFilter = (id: string) => {
-        const updateFilters = typeFilters.map(filter => 
-            filter.id === id ? { ...filter, active: !filter.active } : filter)
-        setTypeFilters(updateFilters)
-    
-        // Log the filter change
-        const filter = typeFilters.find(f => f.id === id)
-        if (filter) {
-            const newState = !filter.active
-            console.log(`Filtro de tipo "${filter.label}" ${newState ? 'ativado' : 'desativado'}`)
-        }
-    }
-
-    // Toggle State Filter
-    const toggleStateFilter = (id: string) => {
-        const updatedFilters = stateFilters.map(filter => 
-            filter.id === id ? { ...filter, active: !filter.active } : filter )
-        setStateFilters(updatedFilters)
-
-        // Log the filter change
-        const filter = stateFilters.find(f => f.id === id)
-        if (filter) {
-            const newState = !filter.active
-            console.log(`Filtro de estado "${filter.label}" ${newState ? 'ativado' : 'desativado'}`)
-        }
     }
 
     // Count active filters

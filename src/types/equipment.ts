@@ -30,14 +30,29 @@ export interface Position {
     lon: number;
 }
 
-export interface EquipmentContextType {
+// Add this to your existing types file
+
+export type FilterOption = {
+    id: string;
+    label: string;
+    active: boolean;
+}
+
+// Update the EquipmentContextType to include filter-related properties
+export type EquipmentContextType = {
     equipment: Equipment[];
     equipmentModels: EquipmentModel[];
     equipmentStates: EquipmentState[];
-    stateHistory: StateHistoryRecord;
-    positionHistory: PositionHistoryRecord;
+    stateHistory: Record<string, StateHistoryItem[]>;
+    positionHistory: Record<string, PositionHistoryItem[]>;
     equipmentNames: Record<string, string>;
     getEquipmentName: (equipmentId: string) => string;
+    // New filter-related properties
+    typeFilters: FilterOption[];
+    stateFilters: FilterOption[];
+    toggleTypeFilter: (id: string) => void;
+    toggleStateFilter: (id: string) => void;
+    filteredEquipment: Equipment[];
     loading: boolean;
     error: string | null;
 }

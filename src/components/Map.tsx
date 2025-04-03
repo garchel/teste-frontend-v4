@@ -20,7 +20,7 @@ import equipmentStates from '../../data/equipmentState.json';
 
 const Map = () => {
   const {
-    equipment,
+    filteredEquipment,
     equipmentModels,
     positionHistory,
     stateHistory,
@@ -34,10 +34,11 @@ const Map = () => {
 
   // Process equipment data once when loaded
   useEffect(() => {
-    if (!loading && !error && equipment.length > 0) {
-      const processedData = equipment.map(eq => {
+    // Sempre atualize os dados, mesmo quando filteredEquipment estiver vazio
+    if (!loading && !error) {
+      const processedData = filteredEquipment.map(eq => {
         // Get equipment info
-        const equipmentData = equipment.find(e => e.id === eq.id);
+        const equipmentData = filteredEquipment.find(e => e.id === eq.id);
         const model = equipmentModels.find(m => m.id === equipmentData?.equipmentModelId);
         
         // Get latest position
@@ -66,7 +67,7 @@ const Map = () => {
       
       setEquipmentData(processedData);
     }
-  }, [loading, equipment, equipmentModels, positionHistory, stateHistory]);
+  }, [loading, filteredEquipment, equipmentModels, positionHistory, stateHistory]);
 
   // Create icon based on model
   // Create icon based on model and state
