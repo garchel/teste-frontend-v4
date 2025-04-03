@@ -1,13 +1,22 @@
-import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Popup, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEquipment } from '../hooks/useEquipment';
 import { useEffect, useState } from 'react';  
 
 // Import equipment icons
-import truckIcon from '../assets/icons/truck.png';
-import excavatorIcon from '../assets/icons/excavator.png';
-import tractorIcon from '../assets/icons/tractor.png';
+import truckIconGreen from '../assets/icons/truck-green.png';
+import truckIconYellow from '../assets/icons/truck-yellow.png';
+import truckIconRed from '../assets/icons/truck-red.png';
+import excavatorIconGreen from '../assets/icons/excavator-green.png';
+import excavatorIconYellow from '../assets/icons/excavator-yellow.png';
+import excavatorIconRed from '../assets/icons/excavator-red.png';
+import tractorIconGreen from '../assets/icons/tractor-green.png';
+import tractorIconYellow from '../assets/icons/tractor-yellow.png';
+import tractorIconRed from '../assets/icons/tractor-red.png';
+
+// Import equipment states
+import equipmentStates from '../../data/equipmentState.json';
 
 const Map = () => {
   const {
@@ -59,43 +68,66 @@ const Map = () => {
   }, [loading, equipment, equipmentModels, positionHistory, stateHistory]);
 
   // Create icon based on model
-  const getIcon = (modelName: string) => {
-    // Create custom icons - pre-initialize them
-    const customIcons = {
-      truck: new L.Icon({
-        iconUrl: truckIcon,
-        iconSize: [64, 64],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -16]
-      }),
-      excavator: new L.Icon({
-        iconUrl: excavatorIcon,
-        iconSize: [64, 64],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -16]
-      }),
-      tractor: new L.Icon({
-        iconUrl: tractorIcon,
-        iconSize: [64, 64],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -16]
-      })
-    };
+  // Create icon based on model and state
+  const getIcon = (modelName: string, stateId?: string) => {
+    // Get state color
+    let stateColor = 'green'; // Default to green
     
-    // Match model name to icon (case insensitive)
-    const model = modelName.toLowerCase();
-    
-    // Map actual model names to icon types
-    if (model.includes('caminhão')) {
-      return customIcons.truck;
-    } else if (model.includes('harvester')) {
-      return customIcons.tractor;
-    } else if (model.includes('garra')) {
-      return customIcons.excavator;
-    } else {
-      // Fallback to a default custom icon
-      return customIcons.truck;
+    if (stateId) {
+      const stateInfo = equipmentStates.find(state => state.id === stateId);
+      if (stateInfo) {
+        if (stateInfo.name === 'Parado') {
+          stateColor = 'yellow';
+        } else if (stateInfo.name === 'Manutenção') {
+          stateColor = 'red';
+        }
+      }
     }
+    
+    // Determine equipment type
+    const model = modelName.toLowerCase();
+    let equipmentType = 'truck'; // Default
+    
+    if (model.includes('caminhão')) {
+      equipmentType = 'truck';
+    } else if (model.includes('harvester')) {
+      equipmentType = 'tractor';
+    } else if (model.includes('garra')) {
+      equipmentType = 'excavator';
+    }
+    
+    // Select the appropriate icon based on equipment type and state
+    let iconUrl;
+    switch (equipmentType) {
+      case 'truck':
+        iconUrl = stateColor === 'green' ? truckIconGreen : 
+                 stateColor === 'yellow' ? truckIconYellow : truckIconRed;
+        break;
+      case 'excavator':
+        iconUrl = stateColor === 'green' ? excavatorIconGreen : 
+                 stateColor === 'yellow' ? excavatorIconYellow : excavatorIconRed;
+        break;
+      case 'tractor':
+        iconUrl = stateColor === 'green' ? tractorIconGreen : 
+                 stateColor === 'yellow' ? tractorIconYellow : tractorIconRed;
+        break;
+    }
+    
+    return new L.Icon({
+      iconUrl,
+      iconSize: [80, 80],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16]
+    });
+  };
+
+  // Helper function to convert state IDs to readable labels
+  // Helper function to get state name from ID
+  const getStateName = (stateId?: string) => {
+    if (!stateId) return 'Desconhecido';
+    
+    const stateInfo = equipmentStates.find(state => state.id === stateId);
+    return stateInfo ? stateInfo.name : 'Desconhecido';
   };
 
   return (
@@ -115,15 +147,16 @@ const Map = () => {
           <Marker
             key={item.id}
             position={item.position}
-            icon={getIcon(item.model)}
+            icon={getIcon(item.model, item.state?.equipmentStateId)}
           >
-            <Popup>
-              <div>
-                <p><strong>ID:</strong> {item.id}</p>
-                <p><strong>Model:</strong> {item.model}</p>
-                <p><strong>State:</strong> {item.state?.equipmentStateId || 'Unknown'}</p>
+            <Tooltip direction="top" offset={[0, -32]} opacity={0.9} permanent={false} className="custom-tooltip">
+              <div className="text-base p-2 min-w-[150px]">
+                <p className="font-bold text-xl">{item.model}</p>
+                <p className="text-lg mt-1">
+                  <strong>Status:</strong> {getStateName(item.state?.equipmentStateId)}
+                </p>
               </div>
-            </Popup>
+            </Tooltip>
           </Marker>
         ))}
       </MapContainer>
