@@ -25,6 +25,20 @@ const EquipmentHistory = () => {
   } = useEquipment();
 
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Add effect to handle visibility with delay
+  useEffect(() => {
+    if (selectedEquipmentId) {
+      // Small delay to allow table to fade out first
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [selectedEquipmentId]);
 
   // Formatar data para exibição
   const formatDate = (date: Date, format: 'full' | 'day' = 'full'): string => {
@@ -100,11 +114,16 @@ const EquipmentHistory = () => {
     setGroupedHistory(groupedArray);
   }, [selectedEquipmentId, stateHistory, positionHistory, equipmentStates]);
 
-  // Se não houver equipamento selecionado, não renderizar
+  // If no equipment selected, still render but with opacity 0
   if (!selectedEquipmentId) return null;
 
+  // Apply fade animation classes
+  const fadeClass = isVisible 
+    ? "opacity-100 transition-opacity duration-300 ease-in" 
+    : "opacity-0 transition-opacity duration-300 ease-out";
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-3 mt-4 max-w-4xl">
+    <div className={`bg-white rounded-lg shadow-sm p-3 absolute top-0 left-0 right-0 z-10 ${fadeClass}`}>
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-sm font-medium text-gray-600">
           Histórico: <span className="text-gray-800">{getEquipmentName(selectedEquipmentId)}</span>

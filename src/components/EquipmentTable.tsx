@@ -20,10 +20,32 @@ const EquipmentTable = () => {
         getEquipmentPositionAtDate,
         loading,
         error,
-        openEquipmentHistory
+        openEquipmentHistory,
+        selectedEquipmentId
     } = useEquipment()
 
     const [tableData, setTableData] = useState<EquipmentTableItem[]>([])
+    const [isVisible, setIsVisible] = useState(true)
+    const [shouldRender, setShouldRender] = useState(true)
+
+    // Update visibility based on selectedEquipmentId with improved handling
+    useEffect(() => {
+        if (selectedEquipmentId) {
+            setIsVisible(false);
+            // Wait for fade out to complete before removing from DOM
+            const timer = setTimeout(() => {
+                setShouldRender(false);
+            }, 300); // Match the duration of the fade-out transition
+            return () => clearTimeout(timer);
+        } else {
+            setShouldRender(true);
+            // Small delay before fading in
+            const timer = setTimeout(() => {
+                setIsVisible(true);
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedEquipmentId]);
 
     useEffect(() => {
         if (!loading && !error) {
@@ -58,13 +80,20 @@ const EquipmentTable = () => {
         return <div className="p-3 text-sm text-red-500">Erro ao carregar dados: {error}</div>
     }
 
+    // Don't render if shouldRender is false
+    if (!shouldRender) return null;
+
+    // Apply CSS classes for fade animation
+    const fadeClass = isVisible 
+        ? "opacity-100 transition-opacity duration-300 ease-in" 
+        : "opacity-0 transition-opacity duration-300 ease-out";
+
     return (
-        <div className="bg-white rounded-lg shadow-sm p-3">
+        <div className={`bg-white rounded-lg shadow-sm p-3 ${fadeClass}`}>
             <div className="flex justify-between items-center mb-3">
                 <h2 className="text-sm font-medium text-gray-600">
                     Lista de Equipamentos
                 </h2>
-                <span className="text-xs text-gray-500">{tableData.length} equipamentos</span>
             </div>
             <div className="overflow-x-auto rounded-md border border-gray-100">
                 <table className="min-w-full divide-y divide-gray-100">

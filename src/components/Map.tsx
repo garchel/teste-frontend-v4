@@ -1,8 +1,24 @@
-import { MapContainer, Marker, TileLayer, Tooltip } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEquipment } from '../hooks/useEquipment';
 import { useEffect, useState, useMemo } from 'react';  
+
+// Componente simples para ajustar o mapa quando o tamanho mudar
+const MapAdjuster = () => {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Ajusta o mapa após renderização e quando a janela for redimensionada
+    const handleResize = () => map.invalidateSize();
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Executa uma vez na montagem
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [map]);
+  
+  return null;
+};
 
 
 // Import equipment icons
@@ -32,7 +48,6 @@ const Map = () => {
     getEquipmentStateAtDate,
     getEquipmentPositionAtDate,
     openEquipmentHistory,
-    selectedEquipmentId,
     loading,
     error
   } = useEquipment();
@@ -260,7 +275,9 @@ const Map = () => {
         center={[-19.2, -46]} 
         zoom={12}
         className="h-full w-full"
+        style={{ height: '100%', width: '100%' }}
       >
+        <MapAdjuster />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
