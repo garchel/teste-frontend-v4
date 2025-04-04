@@ -1,5 +1,6 @@
 
 import { useEquipment } from "../hooks/useEquipment"
+import { useEffect, useState } from "react"
 
 const EquipmentSummary = () => {
     const { 
@@ -7,11 +8,35 @@ const EquipmentSummary = () => {
         selectedDate, 
         getEquipmentStateAtDate, 
         loading, 
-        error 
+        error,
+        selectedEquipmentId
     } = useEquipment()
+
+    const [isVisible, setIsVisible] = useState(true)
+    const [shouldRender, setShouldRender] = useState(true)
+
+    // Update visibility based on selectedEquipmentId with improved handling
+    useEffect(() => {
+        if (selectedEquipmentId) {
+            setIsVisible(false);
+            // Wait for fade out to complete before removing from DOM
+            const timer = setTimeout(() => {
+                setShouldRender(false);
+            }, 300); // Match the duration of the fade-out transition
+            return () => clearTimeout(timer);
+        } else {
+            setShouldRender(true);
+            // Small delay before fading in
+            const timer = setTimeout(() => {
+                setIsVisible(true);
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedEquipmentId]);
 
     if (loading) return <div>Carregando...</div>
     if (error) return <div>Erro ao carregar dados: {error}</div>
+    if (!shouldRender) return null;
 
     // Obter o estado do equipamento na data selecionada
     const getStateAtSelectedDate = (equipmentId: string) => {
@@ -25,8 +50,13 @@ const EquipmentSummary = () => {
         maintenance: filteredEquipment.filter(eq => getStateAtSelectedDate(eq.id) === "03b2d446-e3ba-4c82-8dc2-a5611fea6e1f").length,
     }
 
+    // Apply CSS classes for fade animation
+    const fadeClass = isVisible 
+        ? "opacity-100 transition-opacity duration-300 ease-in" 
+        : "opacity-0 transition-opacity duration-300 ease-out";
+
     return (
-        <div className="bg-white rounded-lg shadow-sm p-3">
+        <div className={`bg-white rounded-lg shadow-sm p-3 ${fadeClass}`}>
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-sm font-medium text-gray-600">Resumo de Equipamentos</h2>
                 <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">

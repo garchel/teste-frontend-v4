@@ -1,7 +1,6 @@
 
-import { Search } from "lucide-react";
-import { Input } from "./ui/input";
 import aikoLogo from "../assets/img/aiko.png";
+import EquipmentSearch from "./EquipmentSearch";
 
 const Header = () => {
   return (
@@ -17,13 +16,8 @@ const Header = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="relative max-w-xs">
-            <Input 
-              type="text" 
-              placeholder="Buscar equipamentos..." 
-              className="pl-9 pr-4 py-2 w-full"
-            />
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+          <div className="relative max-w-xs w-64">
+            <EquipmentSearch />
           </div>
         </div>
       </div>

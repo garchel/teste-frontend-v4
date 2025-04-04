@@ -68,6 +68,8 @@ export type EquipmentContextType = {
     openEquipmentHistory: (equipmentId: string) => void;
     closeEquipmentHistory: () => void;
 
+    getEquipmentById: (equipmentId: string) => Equipment | undefined;
+
     loading: boolean;
     error: string | null;
 }

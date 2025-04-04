@@ -16,8 +16,6 @@ type GroupedHistory = {
 const EquipmentHistory = () => {
   const {
     selectedEquipmentId,
-    closeEquipmentHistory,
-    getEquipmentName,
     stateHistory,
     positionHistory,
     equipmentStates,
@@ -25,20 +23,6 @@ const EquipmentHistory = () => {
   } = useEquipment();
 
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Add effect to handle visibility with delay
-  useEffect(() => {
-    if (selectedEquipmentId) {
-      // Small delay to allow table to fade out first
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 150);
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-    }
-  }, [selectedEquipmentId]);
 
   // Formatar data para exibição
   const formatDate = (date: Date, format: 'full' | 'day' = 'full'): string => {
@@ -77,8 +61,12 @@ const EquipmentHistory = () => {
       // Encontrar posição mais próxima
       const nearestPosition = positions.reduce((nearest, current) => {
         const currentDate = new Date(current.date);
+        const nearestDate = nearest ? new Date(nearest.date) : null;
+        
+        if (!nearestDate) return current;
+        
         const currentDiff = Math.abs(currentDate.getTime() - stateDate.getTime());
-        const nearestDiff = nearest ? Math.abs(new Date(nearest.date).getTime() - stateDate.getTime()) : Infinity;
+        const nearestDiff = Math.abs(nearestDate.getTime() - stateDate.getTime());
         
         return currentDiff < nearestDiff ? current : nearest;
       }, null as any);
@@ -87,13 +75,13 @@ const EquipmentHistory = () => {
         date: stateDate,
         state: state.equipmentStateId,
         stateName: getStateName(state.equipmentStateId),
-        position: nearestPosition ? [nearestPosition.lat, nearestPosition.lon] : null,
+        position: nearestPosition ? [nearestPosition.lat, nearestPosition.lon] : null
       });
     });
-
+    
     // Ordenar por data (mais recente primeiro)
     allEntries.sort((a, b) => b.date.getTime() - a.date.getTime());
-
+    
     // Agrupar por dia
     const grouped: Record<string, HistoryEntry[]> = {};
     
@@ -104,84 +92,67 @@ const EquipmentHistory = () => {
       }
       grouped[dayKey].push(entry);
     });
-
+    
     // Converter para array
-    const groupedArray = Object.entries(grouped).map(([date, entries]) => ({
+    const groupedArray: GroupedHistory[] = Object.keys(grouped).map(date => ({
       date,
-      entries,
+      entries: grouped[date]
     }));
-
+    
     setGroupedHistory(groupedArray);
   }, [selectedEquipmentId, stateHistory, positionHistory, equipmentStates]);
 
-  // If no equipment selected, still render but with opacity 0
   if (!selectedEquipmentId) return null;
 
-  // Apply fade animation classes
-  const fadeClass = isVisible 
-    ? "opacity-100 transition-opacity duration-300 ease-in" 
-    : "opacity-0 transition-opacity duration-300 ease-out";
-
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-3 absolute top-0 left-0 right-0 z-10 ${fadeClass}`}>
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-sm font-medium text-gray-600">
-          Histórico: <span className="text-gray-800">{getEquipmentName(selectedEquipmentId)}</span>
-        </h2>
-        <button 
-          onClick={closeEquipmentHistory}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <div>
+      <h3 className="text-sm font-medium text-gray-700 mb-2">Histórico de Estados</h3>
       
-      {groupedHistory.length === 0 ? (
-        <div className="text-center py-6 text-gray-500 text-sm">
-          Nenhum histórico disponível para este equipamento.
-        </div>
-      ) : (
-        <div className="overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          <div className="flex space-x-4 min-w-max">
-            {groupedHistory.map(group => (
-              <div key={group.date} className="w-[130px] bg-gradient-to-r from-gray-50 to-gray-100 rounded-md p-2 border border-gray-200 flex-shrink-0">
-                <h3 className="text-sm font-medium text-gray-700 mb-2 pb-1 border-b border-gray-200">
-                  {group.date}
-                </h3>
+      <div className="overflow-y-auto max-h-[300px] pr-1">
+        {groupedHistory.map((group, groupIndex) => (
+          <div key={groupIndex} className="mb-3">
+            <h4 className="text-xs font-medium text-gray-500 mb-1 sticky top-0 bg-white py-1">
+              {group.date}
+            </h4>
+            
+            <div className="space-y-2">
+              {group.entries.map((entry, entryIndex) => {
+                // Determinar cor do estado
+                let stateColor = 'bg-gray-100';
+                let textColor = 'text-gray-700';
                 
-                <div className="space-y-2">
-                  {group.entries.map((entry, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-white p-2 rounded-md border-l-3 hover:shadow-sm transition-shadow cursor-pointer"
-                      style={{ 
-                        borderColor: entry.stateName === 'Operando' ? '#10B981' : 
-                                    entry.stateName === 'Parado' ? '#F59E0B' : '#EF4444',
-                        borderLeftWidth: '3px'
-                      }}
-                      onClick={() => {
-                        jumpToTime('specific', entry.date);
-                      }}
-                    >
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-1.5 flex-shrink-0" 
-                          style={{ 
-                            backgroundColor: entry.stateName === 'Operando' ? '#10B981' : 
-                                          entry.stateName === 'Parado' ? '#F59E0B' : '#EF4444'
-                          }}
-                        />
-                        <p className="text-xs text-gray-500 font-medium whitespace-nowrap">{formatDate(entry.date)}</p>
-                      </div>
+                if (entry.stateName === 'Operando') {
+                  stateColor = 'bg-green-100';
+                  textColor = 'text-green-700';
+                } else if (entry.stateName === 'Parado') {
+                  stateColor = 'bg-yellow-100';
+                  textColor = 'text-yellow-700';
+                } else if (entry.stateName === 'Manutenção') {
+                  stateColor = 'bg-red-100';
+                  textColor = 'text-red-700';
+                }
+                
+                return (
+                  <div 
+                    key={entryIndex} 
+                    className={`p-2 rounded-md ${stateColor} cursor-pointer hover:opacity-90 transition-opacity`}
+                    onClick={() => jumpToTime(entry.date)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm font-medium ${textColor}`}>
+                        {entry.stateName}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {formatDate(entry.date)}
+                      </span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

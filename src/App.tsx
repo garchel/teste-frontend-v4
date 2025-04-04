@@ -4,7 +4,7 @@ import EquipmentSummary from "./components/EquipmentSummary"
 import EquipmentTable from "./components/EquipmentTable"
 import Filter from "./components/Filter"
 import { EquipmentProvider } from "./contexts/EquipmentContext"
-import EquipmentHistory from "./components/EquipmentHistory"
+import EquipmentDetails from "./components/EquipmentDetails"
 
 function App() {
   return (
@@ -15,10 +15,12 @@ function App() {
           <main className="flex-1 p-4 flex flex-col md:flex-row gap-4">
             <div className="w-full md:w-1/3 space-y-4">
               <Filter />
-              <EquipmentSummary />
-              <div className="relative">
+              <div className="relative flex flex-col space-y-4">
+                <EquipmentSummary />
                 <EquipmentTable />
-                <EquipmentHistory />
+                <div className="absolute top-0 left-0 right-0 z-20">
+                  <EquipmentDetails />
+                </div>
               </div>
             </div>
             <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm p-4 flex flex-col">

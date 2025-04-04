@@ -276,6 +276,9 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         setSelectedEquipmentId(null)
       }
 
+      const getEquipmentById = useCallback((equipmentId: string): Equipment | undefined => {
+        return equipment.find(eq => eq.id === equipmentId);
+      }, [equipment]);
 
     return (
         <EquipmentContext.Provider 
@@ -304,6 +307,8 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                 selectedEquipmentId,
                 openEquipmentHistory,
                 closeEquipmentHistory,
+
+                getEquipmentById,
 
 
                 loading, 
