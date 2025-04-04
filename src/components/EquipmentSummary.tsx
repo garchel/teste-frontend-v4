@@ -26,27 +26,37 @@ const EquipmentSummary = () => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-heading font-semibold mb-3">Resumo de Equipamentos</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="bg-[#C8E6C9] rounded-md p-3">
-                    <p className="text-sm text-gray-600">Total</p>
-                    <p className="text-2xl font-bold">{equipmentStats.total}</p>
+        <div className="bg-white rounded-lg shadow-sm p-3">
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-sm font-medium text-gray-600">Resumo de Equipamentos</h2>
+                <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
+                    Total: {equipmentStats.total}
+                </span>
+            </div>
+            
+            <div className="flex space-x-3">
+                <div className="flex-1 bg-gradient-to-r from-green-50 to-green-100 rounded-md px-3 py-1.5">
+                    <div className="flex items-center">
+                        <div className="w-2 h-2 rounded-full bg-[#2ecc71] mr-1.5"></div>
+                        <span className="text-xs text-gray-700">Operando:</span>
+                        <span className="text-sm font-bold text-[#2ecc71] ml-1">{equipmentStats.operating}</span>
+                    </div>
                 </div>
-
-                <div className="bg-[#2ecc71]/10 rounded-md p-3">
-                    <p className="text-sm text-gray-600">Operando</p>
-                    <p className="text-2xl font-bold text-[#2ecc71]">{equipmentStats.operating}</p>
+                
+                <div className="flex-1 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-md px-3 py-1.5">
+                    <div className="flex items-center">
+                        <div className="w-2 h-2 rounded-full bg-[#f1c40f] mr-1.5"></div>
+                        <span className="text-xs text-gray-700">Parados:</span>
+                        <span className="text-sm font-bold text-[#f1c40f] ml-1">{equipmentStats.stopped}</span>
+                    </div>
                 </div>
-
-                <div className="bg-[#f1c40f]/10 rounded-md p-3">
-                    <p className="text-sm text-gray-600">Parados</p>
-                    <p className="text-2xl font-bold text-[#f1c40f]">{equipmentStats.stopped}</p>
-                </div>
-
-                <div className="bg-[#e74c3c]/10 rounded-md p-3">
-                    <p className="text-sm text-gray-600">Manutenção</p>
-                    <p className="text-2xl font-bold text-[#e74c3c]">{equipmentStats.maintenance}</p>
+                
+                <div className="flex-1 bg-gradient-to-r from-red-50 to-red-100 rounded-md px-3 py-1.5">
+                    <div className="flex items-center">
+                        <div className="w-2 h-2 rounded-full bg-[#e74c3c] mr-1.5"></div>
+                        <span className="text-xs text-gray-700">Manutenção:</span>
+                        <span className="text-sm font-bold text-[#e74c3c] ml-1">{equipmentStats.maintenance}</span>
+                    </div>
                 </div>
             </div>
         </div>

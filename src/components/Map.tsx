@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { useEquipment } from '../hooks/useEquipment';
 import { useEffect, useState, useMemo } from 'react';  
 
+
 // Import equipment icons
 import truckIconGreen from '../assets/icons/truck-green.png';
 import truckIconYellow from '../assets/icons/truck-yellow.png';
@@ -30,6 +31,8 @@ const Map = () => {
     jumpToTime,
     getEquipmentStateAtDate,
     getEquipmentPositionAtDate,
+    openEquipmentHistory,
+    selectedEquipmentId,
     loading,
     error
   } = useEquipment();
@@ -132,7 +135,7 @@ const Map = () => {
     
     return new L.Icon({
       iconUrl,
-      iconSize: [80, 80],
+      iconSize: [32, 32],
       iconAnchor: [16, 16],
       popupAnchor: [0, -16]
     });
@@ -252,7 +255,7 @@ const Map = () => {
           </svg>
         </button>
       </div>
-      
+    <div className='relative h-full w-full'> 
       <MapContainer
         center={[-19.2, -46]} 
         zoom={12}
@@ -268,6 +271,11 @@ const Map = () => {
             key={item.id}
             position={item.position}
             icon={getIcon(item.model, item.state?.equipmentStateId)}
+            eventHandlers={{
+              click: () => {
+                openEquipmentHistory(item.id);
+              }
+            }}
           >
             <Tooltip direction="top" offset={[0, -32]} opacity={0.9} permanent={false} className="custom-tooltip">
               <div className="text-base p-2 min-w-[150px]">
@@ -284,7 +292,8 @@ const Map = () => {
         ))}
       </MapContainer>
     </div>
-  );
+  </div>
+);
 };
 
 export default Map;

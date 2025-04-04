@@ -47,12 +47,14 @@ export type EquipmentContextType = {
     positionHistory: Record<string, PositionHistoryItem[]>;
     equipmentNames: Record<string, string>;
     getEquipmentName: (equipmentId: string) => string;
+    
     // Propriedades relacinads aos Filtros
     typeFilters: FilterOption[];
     stateFilters: FilterOption[];
     toggleTypeFilter: (id: string) => void;
     toggleStateFilter: (id: string) => void;
     filteredEquipment: Equipment[];
+
     // Propriedades relacionadas à data
     selectedDate: Date;
     updateSelectedDate: (date: Date) => void;
@@ -60,6 +62,11 @@ export type EquipmentContextType = {
     getEquipmentPositionAtDate: (equipmentId: string, date: Date) => [number, number] | null;
     advanceTime: (hours: number) => void;
     jumpToTime: (timePoint: 'start' | 'end' | 'specific', specificDate?: Date) => void;
+
+    // Propriedades relacionadas ao histórico
+    selectedEquipmentId: string | null;
+    openEquipmentHistory: (equipmentId: string) => void;
+    closeEquipmentHistory: () => void;
 
     loading: boolean;
     error: string | null;

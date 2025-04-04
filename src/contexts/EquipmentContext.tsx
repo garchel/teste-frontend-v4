@@ -25,7 +25,7 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    // Add filter states
+    // Adiciona os Estados dos Filtros
     const [typeFilters, setTypeFilters] = useState<FilterOption[]>([
         { id: 'truck', label: 'Caminhão', active: false },
         { id: 'tractor', label: 'Trator', active: false },
@@ -38,11 +38,15 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         { id: 'maintenance', label: 'Manutenção', active: false },
     ])
 
-    // Adicionar estado para a data selecionada
+    // Adiciona estado para a data selecionada
     const [selectedDate, setSelectedDate] = useState<Date>(() => {
         // Por padrão, usar a data mais recente disponível nos dados ou a data atual
         return new Date('2021-02-28T23:59:59.999Z'); // Data final dos dados históricos
     });
+
+    // Adiciona o estado para o equip selecionado para o Histórico
+    const [selectedEquipmentId, setSelectedEquipmentId] = useState<string | null>(null)
+
 
     useEffect(() => {
         const loadAllData = async () => {
@@ -262,6 +266,17 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
         });
       }, [equipment, equipmentModels, typeFilters, stateFilters, selectedDate, loading, error]);
 
+      // Função para abrir o histórico de um equip especifico
+      const openEquipmentHistory = (equipmentId: string) => {
+        setSelectedEquipmentId(equipmentId)
+      }
+
+      // Função para fechar o histórico de equipamentos
+      const closeEquipmentHistory = () => {
+        setSelectedEquipmentId(null)
+      }
+
+
     return (
         <EquipmentContext.Provider 
             value={{ 
@@ -285,6 +300,12 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                 getEquipmentPositionAtDate,
                 advanceTime,
                 jumpToTime,
+                // Propriedades relacionadas ao histórico
+                selectedEquipmentId,
+                openEquipmentHistory,
+                closeEquipmentHistory,
+
+
                 loading, 
                 error 
             }}

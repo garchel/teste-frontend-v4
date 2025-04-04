@@ -4,6 +4,7 @@ import EquipmentSummary from "./components/EquipmentSummary"
 import EquipmentTable from "./components/EquipmentTable"
 import Filter from "./components/Filter"
 import { EquipmentProvider } from "./contexts/EquipmentContext"
+import EquipmentHistory from "./components/EquipmentHistory"
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Filter />
               <EquipmentSummary />
               <EquipmentTable />
+              <EquipmentHistory />
             </div>
             <div className="w-2/3 bg-white rounded-lg shadow-sm p-4">
               <div className="h-[calc(100vh-200px)] w-full">
