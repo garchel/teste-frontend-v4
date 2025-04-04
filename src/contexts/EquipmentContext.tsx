@@ -28,8 +28,8 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
     // Adiciona os Estados dos Filtros
     const [typeFilters, setTypeFilters] = useState<FilterOption[]>([
         { id: 'truck', label: 'Caminhão', active: false },
-        { id: 'tractor', label: 'Trator', active: false },
-        { id: 'excavator', label: 'Escavadeira', active: false },
+        { id: 'harvester', label: 'Colheitadeira', active: false },
+        { id: 'garra', label: 'Garra', active: false },
     ])
 
     const [stateFilters, setStateFilters] = useState<FilterOption[]>([
@@ -84,8 +84,19 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
                         // Increment counter
                         modelCounts[model.name]++
                         
-                        // Create friendly name like "Trator 1", "Escavadora 2", etc.
-                        names[eq.id] = `${model.name} ${modelCounts[model.name]}`
+                        // Create friendly name with consistent naming
+                        let friendlyName = model.name;
+                        
+                        // Standardize model names in friendly names
+                        if (model.name.toLowerCase().includes('caminhão')) {
+                            friendlyName = 'Caminhão';
+                        } else if (model.name.toLowerCase().includes('harvester')) {
+                            friendlyName = 'Colheitadeira';
+                        } else if (model.name.toLowerCase().includes('garra')) {
+                            friendlyName = 'Garra';
+                        }
+                        
+                        names[eq.id] = `${friendlyName} ${modelCounts[model.name]}`;
                     }
                 })
                 
@@ -171,8 +182,8 @@ export function EquipmentProvider({ children }: { children: React.ReactNode }) {
     const getEquipmentType = (modelName: string): string => {
         const model = modelName.toLowerCase()
         if (model.includes('caminhão')) return 'truck'
-        if (model.includes('harvester')) return 'tractor'
-        if (model.includes('garra')) return 'excavator'
+        if (model.includes('harvester')) return 'harvester'
+        if (model.includes('garra')) return 'garra'
         return 'truck' // Default
     }
 
