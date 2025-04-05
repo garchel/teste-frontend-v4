@@ -1,15 +1,13 @@
 import { useEquipment } from "../hooks/useEquipment"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, FC } from "react";
+import TableHeader from "./table/TableHeader";
+import EquipmentRow from "./table/EquipmentRow";
+import LoadingState from "./common/LoadingState";
+import ErrorState from "./common/ErrorState";
 
-type EquipmentTableItem = {
-    id: string,
-    name: string,
-    type: string,
-    state: string,
-    stateColor: string,
-}
 
-const EquipmentTable = () => {
+const EquipmentTable: FC = () => {
+    // Obtém dados e funções do contexto global de equipamentos
     const {
         filteredEquipment,
         equipmentModels,
@@ -17,73 +15,77 @@ const EquipmentTable = () => {
         getEquipmentName,
         selectedDate,
         getEquipmentStateAtDate,
-        getEquipmentPositionAtDate,
         loading,
         error,
         openEquipmentHistory,
         selectedEquipmentId
-    } = useEquipment()
+    } = useEquipment();
 
-    const [tableData, setTableData] = useState<EquipmentTableItem[]>([])
-    const [isVisible, setIsVisible] = useState(true)
-    const [shouldRender, setShouldRender] = useState(true)
+    // Estados para controlar a animação de fade-out antes de remover o componente da DOM
+    const [isVisible, setIsVisible] = useState(true);
+    const [shouldRender, setShouldRender] = useState(true);
 
-    // Update visibility based on selectedEquipmentId with improved handling
+    // Implementa transição suave ao alternar entre tabela e detalhes do equipamento
     useEffect(() => {
         if (selectedEquipmentId) {
+            // Primeiro torna invisível (fade-out) e depois remove da DOM para animação suave
             setIsVisible(false);
-            // Wait for fade out to complete before removing from DOM
             const timer = setTimeout(() => {
                 setShouldRender(false);
-            }, 300); // Match the duration of the fade-out transition
+            }, 300); // Tempo sincronizado com a duração da transição CSS
             return () => clearTimeout(timer);
         } else {
+            // Primeiro adiciona à DOM (invisível) e depois torna visível (fade-in)
             setShouldRender(true);
-            // Small delay before fading in
             const timer = setTimeout(() => {
                 setIsVisible(true);
-            }, 50);
+            }, 50); // Pequeno delay para garantir que o DOM foi atualizado
             return () => clearTimeout(timer);
         }
     }, [selectedEquipmentId]);
 
-    useEffect(() => {
-        if (!loading && !error) {
-            const processedData = filteredEquipment.map(eq => {
-                // Get equipment info
-                const model = equipmentModels.find(m => m.id === eq.equipmentModelId)
+    // Processa os dados brutos em formato adequado para a tabela
+    // Usa memoização para evitar recálculos desnecessários durante renderizações
+    const tableData = useMemo(() => {
+        if (loading || error) return [];
 
-                // Get state at selected date
-                const stateId = getEquipmentStateAtDate(eq.id, selectedDate);
-                
-                // Get state info
-                const stateInfo = stateId ? equipmentStates.find(s => s.id === stateId) : null;
-            
-                return {
-                    id: eq.id,
-                    name: getEquipmentName(eq.id),
-                    type: model?.name || 'Desconhecido',
-                    state: stateInfo?.name || 'Desconhecido',
-                    stateColor: stateInfo?.color || '#999',
-                }
-            })
+        return filteredEquipment.map(eq => {
+            const model = equipmentModels.find(m => m.id === eq.equipmentModelId);
+            const stateId = getEquipmentStateAtDate(eq.id, selectedDate);
+            const stateInfo = stateId ? equipmentStates.find(s => s.id === stateId) : null;
+        
+            return {
+                id: eq.id,
+                name: getEquipmentName(eq.id),
+                type: model?.name || 'Desconhecido',
+                state: stateInfo?.name || 'Desconhecido',
+                stateColor: stateInfo?.color || '#999', // Cor padrão para estados desconhecidos
+            };
+        });
+    }, [
+        loading, 
+        error,
+        filteredEquipment, 
+        equipmentModels, 
+        equipmentStates, 
+        getEquipmentName, 
+        selectedDate, 
+        getEquipmentStateAtDate
+    ]);
 
-            setTableData(processedData)
-        }
-    }, [loading, filteredEquipment, equipmentModels, equipmentStates, getEquipmentName, selectedDate, getEquipmentStateAtDate, getEquipmentPositionAtDate])
-
+    // Renderização condicional para estados de carregamento e erro
     if (loading) {
-        return <div className="p-3 text-sm text-gray-500">Carregando...</div>
+        return <LoadingState message="Carregando..." />;
     }
 
     if (error) {
-        return <div className="p-3 text-sm text-red-500">Erro ao carregar dados: {error}</div>
+        return <ErrorState message={`Erro ao carregar dados: ${error}`} />;
     }
 
-    // Don't render if shouldRender is false
+    // Evita renderização quando o componente deve estar oculto
     if (!shouldRender) return null;
 
-    // Apply CSS classes for fade animation
+    // Define classes CSS para animação de fade baseada no estado de visibilidade
     const fadeClass = isVisible 
         ? "opacity-100 transition-opacity duration-300 ease-in" 
         : "opacity-0 transition-opacity duration-300 ease-out";
@@ -96,46 +98,21 @@ const EquipmentTable = () => {
                 </h2>
             </div>
             <div className="overflow-x-auto rounded-md border border-gray-100">
-                <table className="min-w-full divide-y divide-gray-100">
-                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr>
-                            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nome
-                            </th>
-                            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Tipo
-                            </th>
-                            <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Estado
-                            </th>
-                        </tr>
-                    </thead>
+                <table className="min-w-full divide-y divide-gray-100" aria-label="Lista de equipamentos">
+                    <TableHeader />
                     <tbody className="bg-white divide-y divide-gray-50">
                         {tableData.map((item) => (
-                            <tr 
-                                key={item.id} 
-                                className="hover:bg-blue-50 transition-colors cursor-pointer"
-                                onClick={() => openEquipmentHistory(item.id)}
-                            >
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                    <div className="font-medium text-gray-800 text-sm">{item.name}</div>
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                    <div className="text-gray-500 text-sm">{item.type}</div>
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <span className="h-2.5 w-2.5 rounded-full mr-2" style={{backgroundColor: item.stateColor }}></span>
-                                        <span className="text-sm">{item.state}</span>
-                                    </div>
-                                </td>
-                            </tr>
+                            <EquipmentRow 
+                                key={item.id}
+                                equipment={item}
+                                onSelect={openEquipmentHistory}
+                            />
                         ))}
                     </tbody>
                 </table>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default EquipmentTable
+export default EquipmentTable;

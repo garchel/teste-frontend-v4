@@ -113,3 +113,11 @@ export interface PositionData {
     equipmentId: string;
     positions: PositionHistoryItem[];
 }
+
+export interface EquipmentTableItem {
+    id: string;
+    name: string;
+    type: string;
+    state: string;
+    stateColor: string;
+}
