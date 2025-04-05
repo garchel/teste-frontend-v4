@@ -196,7 +196,7 @@ const Map = () => {
     <div className="relative h-full">
       <h2 className="text-lg font-semibold mb-3">Mapa de Rastreamento</h2>
       
-      {/* Time Controls - Apple-inspired floating interface */}
+      {/* Botões de tempo */}
       <div className="absolute top-12 left-1/2 transform -translate-x-1/2 z-[1500] flex items-center bg-white/90 backdrop-blur-md rounded-full px-3 py-2 shadow-lg border border-gray-200">
         <button 
           onClick={() => jumpToTime('start')}
