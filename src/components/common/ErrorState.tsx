@@ -5,8 +5,8 @@ interface ErrorStateProps {
 }
 
 const ErrorState: FC<ErrorStateProps> = ({ message }) => (
-    <div className="p-3 text-sm text-red-500" role="alert">
-        {message}
+    <div className="bg-white rounded-lg shadow-sm p-3" role="alert">
+        <div className="text-sm text-red-500">{message}</div>
     </div>
 );
 

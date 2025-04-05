@@ -5,8 +5,8 @@ interface LoadingStateProps {
 }
 
 const LoadingState: FC<LoadingStateProps> = ({ message }) => (
-    <div className="p-3 text-sm text-gray-500" role="status" aria-live="polite">
-        {message}
+    <div className="bg-white rounded-lg shadow-sm p-3" role="status" aria-live="polite">
+        <div className="text-sm text-gray-500">{message}</div>
     </div>
 );
 
