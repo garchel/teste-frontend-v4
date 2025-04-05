@@ -1,19 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, FC } from 'react';
 import { useEquipment } from '../hooks/useEquipment';
+import HistoryGroup from './history/HistoryGroup';
+import { formatDate } from '../utils/dateUtils';
+import { HistoryEntry, GroupedHistory } from '../types/history';
 
-type HistoryEntry = {
-  date: Date;
-  state: string;
-  stateName: string;
-  position: [number, number] | null;
-};
-
-type GroupedHistory = {
-  date: string; // Data formatada (dia/mês)
-  entries: HistoryEntry[];
-};
-
-const EquipmentHistory = () => {
+const EquipmentHistory: FC = () => {
+  // Acessa dados e funções do contexto global de equipamentos
   const {
     selectedEquipmentId,
     stateHistory,
@@ -24,26 +16,13 @@ const EquipmentHistory = () => {
 
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
 
-  // Formatar data para exibição
-  const formatDate = (date: Date, format: 'full' | 'day' = 'full'): string => {
-    if (format === 'day') {
-      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    }
-    return date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  // Obter nome do estado a partir do ID
-  const getStateName = (stateId: string): string => {
+  // Memoiza a função para evitar recriações desnecessárias em cada renderização
+  const getStateName = useCallback((stateId: string): string => {
     const state = equipmentStates.find(s => s.id === stateId);
     return state ? state.name : 'Desconhecido';
-  };
+  }, [equipmentStates]);
 
-  // Processar histórico do equipamento
+  // Recalcula o histórico quando os dados relevantes mudam
   useEffect(() => {
     if (!selectedEquipmentId) return;
 
@@ -52,13 +31,11 @@ const EquipmentHistory = () => {
     const positions = positionHistory[selectedEquipmentId] || [];
 
     // Combinar estados e posições
-    const allEntries: HistoryEntry[] = [];
-
-    // Adicionar estados
-    states.forEach(state => {
+    const allEntries: HistoryEntry[] = states.map(state => {
       const stateDate = new Date(state.date);
       
-      // Encontrar posição mais próxima
+      // Algoritmo para encontrar a posição registrada mais próxima temporalmente
+      // do momento em que o estado foi alterado, para maior precisão na visualização
       const nearestPosition = positions.reduce((nearest, current) => {
         const currentDate = new Date(current.date);
         const nearestDate = nearest ? new Date(nearest.date) : null;
@@ -69,20 +46,20 @@ const EquipmentHistory = () => {
         const nearestDiff = Math.abs(nearestDate.getTime() - stateDate.getTime());
         
         return currentDiff < nearestDiff ? current : nearest;
-      }, null as any);
+      }, null as (typeof positions[0] | null));
       
-      allEntries.push({
+      return {
         date: stateDate,
         state: state.equipmentStateId,
         stateName: getStateName(state.equipmentStateId),
         position: nearestPosition ? [nearestPosition.lat, nearestPosition.lon] : null
-      });
+      };
     });
     
-    // Ordenar por data (mais recente primeiro)
+    // Ordenação decrescente para mostrar eventos mais recentes primeiro
     allEntries.sort((a, b) => b.date.getTime() - a.date.getTime());
     
-    // Agrupar por dia
+    // Agrupa entradas por dia para melhorar a organização visual e facilitar a navegação
     const grouped: Record<string, HistoryEntry[]> = {};
     
     allEntries.forEach(entry => {
@@ -93,64 +70,40 @@ const EquipmentHistory = () => {
       grouped[dayKey].push(entry);
     });
     
-    // Converter para array
+    // Transforma o objeto agrupado em array para facilitar a renderização
     const groupedArray: GroupedHistory[] = Object.keys(grouped).map(date => ({
       date,
       entries: grouped[date]
     }));
     
     setGroupedHistory(groupedArray);
-  }, [selectedEquipmentId, stateHistory, positionHistory, equipmentStates]);
+  }, [selectedEquipmentId, stateHistory, positionHistory, equipmentStates, getStateName]);
 
+  // Adapta a função jumpToTime para o formato esperado pelo componente HistoryGroup
+  const handleSelectEntry = useCallback((date: Date) => {
+    jumpToTime('specific', date);
+  }, [jumpToTime]);
+  
+  // Evita renderização desnecessária quando nenhum equipamento está selecionado
   if (!selectedEquipmentId) return null;
-
+  
   return (
     <div>
-      <h3 className="text-sm font-medium text-gray-700 mb-2">Histórico de Estados</h3>
+      <h3 className="text-sm font-medium text-gray-700 mb-2">
+        Histórico de Estados
+      </h3>
       
-      <div className="overflow-y-auto max-h-[300px] pr-1">
+      <div 
+        className="overflow-y-auto max-h-[300px] pr-1"
+        role="log"
+        aria-label="Histórico de estados do equipamento"
+      >
         {groupedHistory.map((group, groupIndex) => (
-          <div key={groupIndex} className="mb-3">
-            <h4 className="text-xs font-medium text-gray-500 mb-1 sticky top-0 bg-white py-1">
-              {group.date}
-            </h4>
-            
-            <div className="space-y-2">
-              {group.entries.map((entry, entryIndex) => {
-                // Determinar cor do estado
-                let stateColor = 'bg-gray-100';
-                let textColor = 'text-gray-700';
-                
-                if (entry.stateName === 'Operando') {
-                  stateColor = 'bg-green-100';
-                  textColor = 'text-green-700';
-                } else if (entry.stateName === 'Parado') {
-                  stateColor = 'bg-yellow-100';
-                  textColor = 'text-yellow-700';
-                } else if (entry.stateName === 'Manutenção') {
-                  stateColor = 'bg-red-100';
-                  textColor = 'text-red-700';
-                }
-                
-                return (
-                  <div 
-                    key={entryIndex} 
-                    className={`p-2 rounded-md ${stateColor} cursor-pointer hover:opacity-90 transition-opacity`}
-                    onClick={() => jumpToTime(entry.date)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className={`text-sm font-medium ${textColor}`}>
-                        {entry.stateName}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {formatDate(entry.date)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <HistoryGroup 
+            key={groupIndex}
+            group={group}
+            onSelectEntry={handleSelectEntry}
+          />
         ))}
       </div>
     </div>
