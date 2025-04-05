@@ -1,7 +1,8 @@
-import { useState, FC } from "react";
+import { useState, FC, useRef } from "react";
 import { useEquipment } from "../hooks/useEquipment";
 import FilterDropdown from "./filter/FilterDropdown";
 import DateTimeFilter from "./filter/DateTimeFilter";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 const Filter: FC = () => {
     // Obtém dados e funções do contexto global de equipamentos
@@ -16,6 +17,16 @@ const Filter: FC = () => {
 
     // Controla qual dropdown está aberto para evitar múltiplos dropdowns abertos simultaneamente
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    
+    // Referência para o container dos filtros
+    const filterContainerRef = useRef<HTMLDivElement>(null);
+
+    // Usa o hook useClickOutside para fechar os dropdowns quando clicar fora deles
+    useClickOutside(filterContainerRef, () => {
+        if (openDropdown) {
+            setOpenDropdown(null);
+        }
+    });
 
     // Alterna entre abrir o dropdown selecionado ou fechar se já estiver aberto
     const toggleDropdown = (dropdown: string) => {
@@ -27,7 +38,7 @@ const Filter: FC = () => {
     const activeStateFilters = stateFilters.filter(f => f.active).length;
 
     return (
-        <div className="bg-white rounded-lg shadow-sm p-3 mb-4">
+        <div className="bg-white rounded-lg shadow-sm p-3 mb-4" ref={filterContainerRef}>
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-sm font-medium text-gray-600">Filtros</h2>
             </div>
