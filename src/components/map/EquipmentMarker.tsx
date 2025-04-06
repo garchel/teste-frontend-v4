@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Marker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 
+// Tipos que permitem posição nula para equipamentos fora do mapa
 type EquipmentPosition = [number, number] | null;
 type EquipmentState = { equipmentStateId?: string };
 
@@ -14,9 +15,12 @@ interface EquipmentDataItem {
 
 interface EquipmentMarkerProps {
   item: EquipmentDataItem;
+  // Função para obter ícones personalizados baseados no modelo e estado
   getIcon: (modelName: string, stateId?: string) => L.Icon;
+  // Funções para obter dados formatados para exibição no tooltip
   getEquipmentName: (id: string) => string;
   getStateName: (stateId?: string) => string;
+  // Callback para abrir o histórico ao clicar no marcador
   openEquipmentHistory: (id: string) => void;
 }
 
@@ -27,6 +31,7 @@ const EquipmentMarker: FC<EquipmentMarkerProps> = ({
   getStateName,
   openEquipmentHistory
 }) => {
+  // Evita renderização de equipamentos sem posição definida
   if (!item.position) return null;
   
   return (
@@ -40,6 +45,7 @@ const EquipmentMarker: FC<EquipmentMarkerProps> = ({
     >
       <Tooltip 
         direction="top" 
+        // Offset para posicionar o tooltip acima do ícone sem sobreposição
         offset={[0, -32]} 
         opacity={0.9} 
         permanent={false} 

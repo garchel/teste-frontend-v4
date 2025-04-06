@@ -3,7 +3,9 @@ import TimeButton from './TimeButton';
 
 interface TimeControlsProps {
   selectedDate: Date;
+  // Função para avançar/retroceder no tempo em horas
   advanceTime: (hours: number) => void;
+  // Função para saltar para pontos específicos na linha do tempo
   jumpToTime: (timePoint: 'start' | 'end' | 'specific', specificDate?: Date) => void;
   formatDate: (date: Date) => string;
 }
@@ -27,10 +29,12 @@ const TimeControls: FC<TimeControlsProps> = ({
         </svg>
       </button>
       
+      {/* Botões para navegação em intervalos predefinidos */}
       <TimeButton onClick={() => advanceTime(-24)} title="Voltar 1 dia">-1d</TimeButton>
       <TimeButton onClick={() => advanceTime(-6)} title="Voltar 6 horas">-6h</TimeButton>
       <TimeButton onClick={() => advanceTime(-1)} title="Voltar 1 hora">-1h</TimeButton>
       
+      {/* Exibição centralizada da data atual selecionada */}
       <div className="mx-3 px-3 py-1 bg-gray-100 rounded-full text-lg font-medium text-gray-800">
         {formatDate(selectedDate)}
       </div>

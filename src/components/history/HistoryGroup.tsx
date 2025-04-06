@@ -4,7 +4,9 @@ import { GroupedHistory } from '../../types/history';
 
 
 interface HistoryGroupProps {
+  // Grupo de eventos históricos organizados por data
   group: GroupedHistory;
+  // Callback para atualizar a linha do tempo quando um evento for selecionado
   onSelectEntry: (date: Date) => void;
 }
 

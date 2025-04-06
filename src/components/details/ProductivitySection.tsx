@@ -4,6 +4,7 @@ import { MetricCard } from './MetricCard';
 import { formatPercentage } from '../../utils/formatters';
 
 interface ProductivitySectionProps {
+  // Permite renderização condicional baseada na disponibilidade dos dados
   productivity: ProductivityData | null;
 }
 

@@ -4,6 +4,7 @@ import { MetricCard } from './MetricCard';
 import { formatCurrency } from '../../utils/formatters';
 
 interface EarningsSectionProps {
+  // Permite renderização condicional baseada na disponibilidade dos dados
   earnings: EarningsData | null;
 }
 
@@ -58,6 +59,7 @@ const EarningsSection: FC<EarningsSectionProps> = ({ earnings }) => {
 interface StateEarningCardProps {
   state: string;
   value: number;
+  // Esquema de cores diferenciado para facilitar identificação visual dos estados
   colorScheme: 'green' | 'yellow' | 'red';
 }
 

@@ -6,9 +6,11 @@ interface FilterDropdownProps {
     label: string;
     filters: FilterItem[];
     toggleFilter: (id: string) => void;
+    // Contador para indicar visualmente quantos filtros estão ativos
     activeCount: number;
     isOpen: boolean;
     onToggle: () => void;
+    // Esquema de cores para diferenciar visualmente os tipos de filtros
     colorScheme: 'blue' | 'purple' | 'green';
 }
 
@@ -21,7 +23,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
     onToggle,
     colorScheme
 }) => {
-    // Map color scheme to Tailwind classes
+    // Mapeamento de esquemas de cores para classes Tailwind correspondentes
     const colorClasses = {
         blue: {
             button: 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-blue-200',
@@ -40,6 +42,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
         }
     };
 
+    // IDs únicos para garantir associação correta entre botão e dropdown (acessibilidade)
     const buttonId = `${label.toLowerCase()}-filter-button`;
     const dropdownId = `${label.toLowerCase()}-filter-dropdown`;
 
@@ -61,6 +64,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                     </span>
                 }
                 <svg 
+                    // Rotação do ícone para indicar visualmente o estado do dropdown
                     className={`w-3 h-3 ml-1.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
@@ -74,6 +78,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
             
             <div 
                 id={dropdownId}
+                // Animação suave para melhorar a experiência do usuário
                 className={`absolute left-0 mt-1 w-44 bg-white rounded-md shadow-lg z-10 transition-all duration-200 ease-in-out ${
                     isOpen 
                         ? 'opacity-100 transform translate-y-0' 

@@ -3,7 +3,9 @@ import { FC, ReactNode } from 'react';
 interface MetricCardProps {
   label: string;
   value: string | ReactNode;
+  // Permite personalização de cores para destacar diferentes tipos de métricas
   valueColor?: string;
+  // Informações contextuais opcionais para complementar o valor principal
   details?: string | ReactNode;
 }
 

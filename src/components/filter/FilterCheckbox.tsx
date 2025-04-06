@@ -3,11 +3,14 @@ import { FilterItem } from '../../types/filters';
 
 interface FilterCheckboxProps {
     filter: FilterItem;
+    // Função para alternar o estado do filtro quando o usuário clicar
     toggleFilter: (id: string) => void;
+    // Esquema de cores para diferenciar visualmente os tipos de filtros
     colorScheme: 'blue' | 'purple' | 'green';
 }
 
 const FilterCheckbox: FC<FilterCheckboxProps> = ({ filter, toggleFilter, colorScheme }) => {
+    // Mapeamento de esquemas de cores para classes Tailwind correspondentes
     const colorClass = {
         blue: 'bg-blue-500 border-blue-500',
         purple: 'bg-purple-500 border-purple-500',
@@ -21,6 +24,7 @@ const FilterCheckbox: FC<FilterCheckboxProps> = ({ filter, toggleFilter, colorSc
             role="menuitem"
         >
             <div 
+                // Aplica cores diferentes baseadas no estado ativo do filtro
                 className={`w-4 h-4 rounded-sm border flex items-center justify-center ${filter.active ? colorClass : 'border-gray-300'}`}
                 aria-hidden="true"
             >
