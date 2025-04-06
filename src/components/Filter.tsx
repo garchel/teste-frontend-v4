@@ -43,36 +43,40 @@ const Filter: FC = () => {
                 <h2 className="text-sm font-medium text-gray-600">Filtros</h2>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap gap-3">
                 {/* Filtro de data limitado ao período de fevereiro/2021 conforme requisitos do projeto */}
-                <DateTimeFilter 
-                    selectedDate={selectedDate}
-                    onDateChange={updateSelectedDate}
-                    minDate="2021-02-01T00:00"
-                    maxDate="2021-02-28T23:59"
-                />
+                <div className="flex-1 min-w-[240px]">
+                    <DateTimeFilter 
+                        selectedDate={selectedDate}
+                        onDateChange={updateSelectedDate}
+                        minDate="2021-02-01T00:00"
+                        maxDate="2021-02-28T23:59"
+                    />
+                </div>
 
-                {/* Dropdown para filtrar por tipo de equipamento */}
-                <FilterDropdown
-                    label="Tipo"
-                    filters={typeFilters}
-                    toggleFilter={toggleTypeFilter}
-                    activeCount={activeTypeFilters}
-                    isOpen={openDropdown === 'type'}
-                    onToggle={() => toggleDropdown('type')}
-                    colorScheme="blue"
-                />
+                <div className="flex gap-3">
+                    {/* Dropdown para filtrar por tipo de equipamento */}
+                    <FilterDropdown
+                        label="Tipo"
+                        filters={typeFilters}
+                        toggleFilter={toggleTypeFilter}
+                        activeCount={activeTypeFilters}
+                        isOpen={openDropdown === 'type'}
+                        onToggle={() => toggleDropdown('type')}
+                        colorScheme="blue"
+                    />
 
-                {/* Dropdown para filtrar por estado operacional do equipamento */}
-                <FilterDropdown
-                    label="Estado"
-                    filters={stateFilters}
-                    toggleFilter={toggleStateFilter}
-                    activeCount={activeStateFilters}
-                    isOpen={openDropdown === 'state'}
-                    onToggle={() => toggleDropdown('state')}
-                    colorScheme="purple"
-                />
+                    {/* Dropdown para filtrar por estado operacional do equipamento */}
+                    <FilterDropdown
+                        label="Estado"
+                        filters={stateFilters}
+                        toggleFilter={toggleStateFilter}
+                        activeCount={activeStateFilters}
+                        isOpen={openDropdown === 'state'}
+                        onToggle={() => toggleDropdown('state')}
+                        colorScheme="purple"
+                    />
+                </div>
             </div>
         </div>
     );

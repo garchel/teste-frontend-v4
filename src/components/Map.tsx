@@ -133,7 +133,7 @@ const Map: FC = () => {
 
   return (
     <div className="relative h-full">
-      <h2 className="text-lg font-semibold mb-3">Mapa de Rastreamento</h2>
+      <h2 className="text-sm font-medium text-gray-600 mb-3 " >Mapa de Rastreamento</h2>
       
       {/* Controles de tempo posicionados acima do mapa para fácil acesso */}
       <TimeControls 

@@ -9,7 +9,7 @@ interface TimeButtonProps {
 const TimeButton: FC<TimeButtonProps> = ({ onClick, title, children }) => (
   <button 
     onClick={onClick}
-    className="px-3 py-1 text-gray-600 hover:text-blue-800 font-medium transition-colors"
+    className="px-2 py-1 text-gray-600 hover:text-blue-800 font-medium transition-colors"
     title={title}
     aria-label={title}
   >

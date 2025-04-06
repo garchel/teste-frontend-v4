@@ -1,54 +1,87 @@
-# React + TypeScript + Vite
+# 📍 Gear Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistema de rastreamento e monitoramento de equipamentos em campo, com visualização em mapa, histórico detalhado e filtros personalizados.
 
-Currently, two official plugins are available:
+## 🚀 Visão Geral
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O **Gear Tracker** permite visualizar a localização, estado e histórico de equipamentos operacionais em tempo real, com navegação temporal e filtros avançados. Ideal para empresas que desejam monitorar frotas de máquinas como colheitadeiras, caminhões, tratores e escavadeiras.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Funcionalidades
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- 🔍 **Busca de Equipamentos** por nome ou modelo.
+- 🗺️ **Mapa interativo (Leaflet)** com ícones customizados por tipo e estado.
+- 🕒 **Navegação Temporal** para ver a posição e estado dos equipamentos em datas passadas.
+- 📊 **Resumo por Tipo de Equipamento** (dashboard).
+- 📋 **Tabela de Equipamentos** com detalhes e ações rápidas.
+- 📈 **Histórico Detalhado** de posições e estados.
+- 📁 **Detalhes completos** de cada equipamento.
+- 🎛️ **Filtro por modelo e data**.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
+- **React Leaflet**
+- **Context API + Custom Hooks**
+- **Vite**
+
+---
+
+## 🧱 Estrutura de Componentes
+
+- `Header.tsx`: Cabeçalho com logotipos e busca.
+- `Map.tsx`: Mapa principal com controle temporal.
+- `EquipmentSearch.tsx`: Campo de busca.
+- `EquipmentTable.tsx`: Tabela de equipamentos.
+- `EquipmentDetails.tsx`: Detalhes de um equipamento.
+- `EquipmentHistory.tsx`: Linha do tempo com posições e estados.
+- `EquipmentSummary.tsx`: Dashboard por tipo.
+- `Filter.tsx`: Filtro lateral por modelo/data.
+
+---
+
+## 🧭 Lógica de Rastreamento
+
+- Cada equipamento tem um modelo, estado e posição associados por data.
+- Os ícones mudam de cor conforme o estado:
+  - 🟢 Operando
+  - 🟡 Parado
+  - 🔴 Em manutenção
+- A navegação temporal permite ver o histórico em qualquer dia e hora.
+
+---
+
+## ▶️ Como Rodar Localmente
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/gear-tracker.git
+cd gear-tracker
+
+# Instale as dependências
+npm install
+
+# Rode o servidor de desenvolvimento
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## 📁 Estrutura de Pastas
 ```
+src/
+├── assets/           # Ícones e imagens
+├── components/
+│   ├── Equipment*    # Componentes principais do projeto
+│   ├── map/          # Componentes específicos do mapa
+├── hooks/            # Custom hooks (useEquipment, etc.)
+├── data/             # JSONs com estados dos equipamentos
+```
+
+## 🧑‍💻 Autor
+Desenvolvido por Paulo Victor Carvalho de Oliveira 
+Linkedin: https://www.linkedin.com/in/paulovictorco
+Email: paulovictor.co97@gmail.com

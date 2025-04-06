@@ -61,28 +61,34 @@ const EquipmentSummary: FC = () => {
                     </span>
                 </div>
                 
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap gap-3">
                     {/* Cards de estatísticas com esquema de cores consistente para facilitar identificação visual */}
-                    <StatCard 
-                        label="Operando"
-                        value={equipmentStats.operating}
-                        color="#2ecc71"
-                        bgColorClass="from-green-50 to-green-100"
-                    />
+                    <div className="flex-1 min-w-[120px] basis-0">
+                        <StatCard 
+                            label="Operando"
+                            value={equipmentStats.operating}
+                            color="#2ecc71"
+                            bgColorClass="from-green-50 to-green-100"
+                        />
+                    </div>
                     
-                    <StatCard 
-                        label="Parados"
-                        value={equipmentStats.stopped}
-                        color="#f1c40f"
-                        bgColorClass="from-yellow-50 to-yellow-100"
-                    />
+                    <div className="flex-1 min-w-[120px] basis-0">
+                        <StatCard 
+                            label="Parados"
+                            value={equipmentStats.stopped}
+                            color="#f1c40f"
+                            bgColorClass="from-yellow-50 to-yellow-100"
+                        />
+                    </div>
                     
-                    <StatCard 
-                        label="Manutenção"
-                        value={equipmentStats.maintenance}
-                        color="#e74c3c"
-                        bgColorClass="from-red-50 to-red-100"
-                    />
+                    <div className="flex-1 min-w-[120px] basis-0 xl:w-auto">
+                        <StatCard 
+                            label="Manutenção"
+                            value={equipmentStats.maintenance}
+                            color="#e74c3c"
+                            bgColorClass="from-red-50 to-red-100"
+                        />
+                    </div>
                 </div>
             </div>
         </FadeContainer>

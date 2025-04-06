@@ -35,7 +35,7 @@ const TimeControls: FC<TimeControlsProps> = ({
       <TimeButton onClick={() => advanceTime(-1)} title="Voltar 1 hora">-1h</TimeButton>
       
       {/* Exibição centralizada da data atual selecionada */}
-      <div className="mx-3 px-3 py-1 bg-gray-100 rounded-full text-lg font-medium text-gray-800">
+      <div className="mx-3 px-4 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-800 whitespace-nowrap min-w-[160px] text-center">
         {formatDate(selectedDate)}
       </div>
       
