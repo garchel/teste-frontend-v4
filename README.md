@@ -72,13 +72,20 @@ npm run dev
 
 ## 📁 Estrutura de Pastas
 ```
+data/             # JSONs com estados dos equipamentos
 src/
 ├── assets/           # Ícones e imagens
 ├── components/
 │   ├── Equipment*    # Componentes principais do projeto
-│   ├── map/          # Componentes específicos do mapa
+│   ├── filter/       # Componentes específicos do Filtro
+│   ├── history/      # Componentes específicos do Histórico
+│   ├── map/          # Componentes específicos do Mapa
+│   ├── search/       # Componentes específicos do Search
+│   ├── summary/      # Componentes específicos do Resumo
+│   ├── table/        # Componentes específicos da Tabela
 ├── hooks/            # Custom hooks (useEquipment, etc.)
-├── data/             # JSONs com estados dos equipamentos
+├── types/            # Custom Types 
+
 ```
 
 ## 🧑‍💻 Autor
