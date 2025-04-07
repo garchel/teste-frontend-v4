@@ -66,10 +66,23 @@ interface StateEarningCardProps {
 // Componente especializado para exibir ganhos por estado com código de cores
 // para facilitar a identificação visual rápida
 const StateEarningCard: FC<StateEarningCardProps> = ({ state, value, colorScheme }) => {
+  // Map colorScheme to specific Tailwind classes
+  const bgColorClass = {
+    'green': 'bg-green-50 border-green-100',
+    'yellow': 'bg-yellow-50 border-yellow-100',
+    'red': 'bg-red-50 border-red-100'
+  }[colorScheme];
+  
+  const textColorClass = {
+    'green': 'text-green-600',
+    'yellow': 'text-yellow-600',
+    'red': 'text-red-600'
+  }[colorScheme];
+
   return (
-    <div className={`p-2 bg-${colorScheme}-50 rounded border border-${colorScheme}-100`}>
+    <div className={`p-2 rounded border ${bgColorClass}`}>
       <p className="text-xs text-gray-500">{state}</p>
-      <p className={`font-medium text-${colorScheme}-600`}>{formatCurrency(value)}</p>
+      <p className={`font-medium ${textColorClass}`}>{formatCurrency(value)}</p>
     </div>
   );
 };
