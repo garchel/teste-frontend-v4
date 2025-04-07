@@ -1,3 +1,5 @@
+# Link da explicação (google drive): https://drive.google.com/file/d/1BuSGbz-qqVhwfEinzQ6WFidQjbYtPuEx/view?usp=sharing 
+
 # 📍 Gear Tracker
 
 Sistema de rastreamento e monitoramento de equipamentos em campo, com visualização em mapa, histórico detalhado e filtros personalizados.
