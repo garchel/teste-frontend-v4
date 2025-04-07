@@ -1,4 +1,7 @@
-# Link da explicação (google drive): https://drive.google.com/file/d/1BuSGbz-qqVhwfEinzQ6WFidQjbYtPuEx/view?usp=sharing 
+# Link da explicação:
+**Google Drive:** https://drive.google.com/file/d/1BuSGbz-qqVhwfEinzQ6WFidQjbYtPuEx/view?usp=sharing 
+**Youtube:** https://www.youtube.com/watch?v=JzG9rBWWFts
+
 
 # 📍 Gear Tracker
 
